@@ -17,8 +17,7 @@ This document is provisional. The requirements doc [open questions](reqs.md#8-op
 ```sh
 git clone <repo-url> && cd wpm
 nix develop        # or install JDK 21, Android SDK, Node 22 manually
-./gradlew build    # core + Android
-npm run build      # web (in webApp/)
+./gradlew :core:allTests
 ```
 
 ## Making changes
@@ -26,7 +25,7 @@ npm run build      # web (in webApp/)
 1. Fork and create a feature branch.
 2. Keep changes focused; match the existing code style (no comments unless they earn their place).
 3. Add or update tests in `core/src/commonTest/` for any core logic change.
-4. Run `./gradlew :core:allTests`, `npm run check`, and `npm run build` before submitting.
+4. Run `./gradlew :core:allTests` before submitting.
 5. Open a PR against `main` with a clear description of the change and why.
 
 ## Reporting issues

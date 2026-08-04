@@ -4,7 +4,7 @@ Fully local, open source **RSVP** (Rapid Serial Visual Presentation) reader for 
 
 No servers. No accounts. No telemetry. Everything runs and stores on your device.
 
-> **Status: fresh start.** This repository currently contains documentation only — the codebase has not been implemented yet. See [reqs.md](reqs.md) for the full product requirements.
+> **Status: Phase 1 complete.** The shared KMP core engine (tokenizer, pacing, stats, backup codec) is implemented and tested across JVM, JS, and Android targets. See [reqs.md](reqs.md) for full requirements and [ROADMAP.md](ROADMAP.md) for what's next.
 
 ## What it is
 
@@ -31,19 +31,19 @@ An app that lets you read text as a steady stream of single words centered on on
 
 iOS is out of scope for the MVP.
 
-## Planned architecture
+## Architecture
 
 Shared core, separate native UIs — a single Kotlin Multiplatform core keeps the pacing algorithm, WPM math, and export format identical across platforms by construction.
 
-| Layer | Planned choice | Notes |
+| Layer | Choice | Status |
 |---|---|---|
-| Shared core | Kotlin Multiplatform, compiled to JVM (Android) and Kotlin/JS (Web) | tokenizer, pacing engine, stats, export/import format |
-| Android UI | Kotlin + Jetpack Compose | consumes the KMP core directly |
-| Web UI | TypeScript + Svelte (MIT — GPLv3-compatible) | consumes the KMP core via its Kotlin/JS output |
-| Android storage | Room / SQLite | durable local DB |
-| Web storage | IndexedDB | paired with export/import since it is not durable |
-| PDF parsing | Readium pdfium adapter (Android) · pdf.js (Web) | open source only — never the pspdfkit adapter |
-| EPUB parsing | Readium Kotlin Toolkit (Android) · epub.js (Web) | BSD-3-Clause; excludes the `readium-lcp` module (proprietary liblcp) |
+| Shared core | Kotlin Multiplatform, compiled to JVM (Android) and Kotlin/JS (Web) | ✅ Done (Phase 1) |
+| Android UI | Kotlin + Jetpack Compose | Todo (Phase 2) |
+| Web UI | TypeScript + Svelte (MIT — GPLv3-compatible) | Todo (Phase 3) |
+| Android storage | Room / SQLite | Todo (Phase 2) |
+| Web storage | IndexedDB | Todo (Phase 3) |
+| PDF parsing | Readium pdfium adapter (Android) · pdf.js (Web) | Todo (Phase 2+) |
+| EPUB parsing | Readium Kotlin Toolkit (Android) · epub.js (Web) | Todo (Phase 2+) |
 
 Every dependency must be GPLv3-compatible. Readium's LCP module and pspdfkit adapter are deliberately excluded because they pull in proprietary code.
 
@@ -71,15 +71,20 @@ The shell is pinned to a fixed nixpkgs commit in `flake.nix`, so every contribut
 ## Repository layout
 
 ```
-flake.nix           Reproducible dev shell (Nix)
-reqs.md             Living product requirements document (spec source of truth)
-ROADMAP.md          Phased implementation roadmap
-README.md           This file
-CONTRIBUTING.md     Contribution guidelines (provisional)
-LICENSE             GPLv3
+flake.nix               Reproducible dev shell (Nix)
+core/                   KMP shared engine (tokenizer, pacing, stats, backup)
+  build.gradle.kts
+  src/commonMain/       Platform-independent Kotlin source
+  src/commonTest/       Tests running on JVM, JS, Android
+gradle/
+  libs.versions.toml    Version catalog (Kotlin, AGP, serialization)
+settings.gradle.kts     Root build config
+reqs.md                 Living product requirements document (spec source of truth)
+ROADMAP.md              Phased implementation roadmap
+CONTRIBUTING.md         Contribution guidelines (provisional)
+docs/dependencies.md    Dependency license audit (OQ-14)
+LICENSE                 GPLv3
 ```
-
-Code modules (`core/`, Android app, web app) will be added as implementation starts.
 
 ## License
 

@@ -18,7 +18,8 @@ This roadmap sequences the work from the current docs-only state to a released M
 | Roadmap | — | Done |
 | Repo hosting, branch strategy, issue/PR templates | OQ-8 | Todo |
 | Governance decisions: maintainership, bus factor, DCO/sign-off, code of conduct | OQ-7, OQ-8 | Todo |
-| CI pipeline + reproducible dev environment | — | Todo |
+| Reproducible dev environment (`nix develop`) | — | Done |
+| CI pipeline | — | Todo |
 
 **Exit criteria:** any contributor can open a PR, run checks, and see clear guidance on process.
 
@@ -28,13 +29,13 @@ The single source of truth for all reading logic, compiled to JVM (Android) and 
 
 | Item | Req | Status |
 |---|---|---|
-| Stand up Kotlin Multiplatform project (android + jvm + js targets) | §10 | Todo |
-| Tokenizer (words + punctuation, correct diacritics/accent handling) | FR-1.1, NFR-6 | Todo |
-| Pacing engine: WPM math, comma/clause pauses, sentence pauses, long-word scaling | FR-1.2, FR-1.3 | Todo |
-| Stats math: session time, time saved vs 250 WPM baseline | FR-6.2 | Todo |
-| Backup codec: single-file JSON export/import schema | FR-7.1, FR-7.2 | Todo |
-| Shared unit tests run on all targets | NFR-2 | Todo |
-| Version pinning + dependency audit baseline (all GPLv3-compatible) | OQ-14 | Todo |
+| Stand up Kotlin Multiplatform project (android + jvm + js targets) | §10 | Done |
+| Tokenizer (words + punctuation, correct diacritics/accent handling) | FR-1.1, NFR-6 | Done |
+| Pacing engine: WPM math, comma/clause pauses, sentence pauses, long-word scaling | FR-1.2, FR-1.3 | Done |
+| Stats math: session time, time saved vs 250 WPM baseline | FR-6.2 | Done |
+| Backup codec: single-file JSON export/import schema | FR-7.1, FR-7.2 | Done |
+| Shared unit tests run on all targets | NFR-2 | Done |
+| Version pinning + dependency audit baseline (all GPLv3-compatible) | OQ-14 | Done |
 
 **Exit criteria:** `core` tests green on JVM, JS, and Android targets; pacing/stats/export behavior is identical across platforms by construction.
 
