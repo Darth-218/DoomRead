@@ -104,11 +104,17 @@
     pointer-events: auto;
     cursor: pointer;
     white-space: pre;
+    -webkit-user-select: text;
+    user-select: text;
   }
   .tl:hover {
     background: rgba(0, 0, 0, 0.08);
   }
   .tl.active {
     background: rgba(255, 224, 138, 0.75);
+  }
+  .tl::selection {
+    color: #111;
+    background: rgba(255, 224, 138, 0.9);
   }
 </style>
