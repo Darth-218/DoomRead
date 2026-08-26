@@ -140,23 +140,28 @@ export async function extractEpub(file: File): Promise<ImportResult> {
     // No navigation document — chapters fall back to "Chapter N".
   }
 
-  const items = (await book.loaded.spine) as any[]
+  // book.loaded.spine resolves to a Spine *instance* (not an array); the
+  // iterable list of sections is spine.spineItems.
   let text = ''
   const chapters: ChapterMeta[] = []
-  for (const item of items) {
-    if (!item.href || item.linear === 'no') continue
-    const section = book.section(item.href)
-    if (!section) continue
-    const doc = await section.load(book.load.bind(book))
-    const t = (doc?.body?.textContent ?? '').trim()
-    section.unload()
-    if (!t) continue
-    const base = item.href.split('#')[0]
-    const title = tocByHref.get(base) ?? `Chapter ${chapters.length + 1}`
-    if (text) text += '\n\n'
-    const offset = text.length
-    text += t
-    chapters.push({ title, offset })
+  try {
+    const spine = (await book.loaded.spine) as any
+    const sections = (spine?.spineItems ?? []) as any[]
+    for (const section of sections) {
+      if (!section.href || section.linear === false || section.linear === 'no') continue
+      const doc = await section.load(book.load.bind(book))
+      const t = (doc?.body?.textContent ?? '').trim()
+      section.unload()
+      if (!t) continue
+      const base = section.href.split('#')[0]
+      const title = tocByHref.get(base) ?? `Chapter ${chapters.length + 1}`
+      if (text) text += '\n\n'
+      const offset = text.length
+      text += t
+      chapters.push({ title, offset })
+    }
+  } catch {
+    // Spine unavailable — fall back to whatever text we managed to extract.
   }
   return { text, chapters }
 }
