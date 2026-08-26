@@ -50,7 +50,7 @@
     {#if activeDoc}
       <div class="reading">
         {#key appState.activeDocumentId}
-          <Reader document={activeDoc} />
+          <div class="pane"><Reader document={activeDoc} /></div>
           <SourcePanel text={activeDoc.text} />
         {/key}
       </div>
@@ -109,13 +109,13 @@
   }
   .reading {
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
     align-items: flex-start;
     width: 100%;
     max-width: 1100px;
   }
-  .reading > :global(.reader) {
-    flex: 0 0 360px;
-    max-width: 360px;
+  .pane {
+    flex: 1 1 0;
+    min-width: 0;
   }
 </style>

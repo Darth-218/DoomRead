@@ -220,7 +220,7 @@
   })
 </script>
 
-<button type="button" class="word reader" aria-label="Play or pause" onclick={toggle}>{word}</button>
+<button type="button" class="word" aria-label="Play or pause" onclick={toggle}>{word}</button>
 <div class="controls">
   <label for="wpm">WPM {wpm}</label>
   <div class="wpm-control">
