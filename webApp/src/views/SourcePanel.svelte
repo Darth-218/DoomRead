@@ -1,9 +1,9 @@
 <script lang="ts">
   import { readerBus, jumpTo } from '../lib/readerBus.svelte'
-  import type { PdfDocData } from '../lib/stores.svelte'
-  import PdfPage from './PdfPage.svelte'
+  import type { PdfDocMeta } from '../lib/stores.svelte'
+  import PdfViewer from './PdfViewer.svelte'
 
-  let { text, pdf }: { text: string; pdf?: PdfDocData } = $props()
+  let { text, pdf, documentId }: { text: string; pdf?: PdfDocMeta; documentId?: string } = $props()
 
   interface Node {
     type: 'word' | 'text'
@@ -56,10 +56,8 @@
 </script>
 
 <div class="source" class:pdf={!!pdf} bind:this={container}>
-  {#if pdf}
-    {#each pdf.pages as page, i (i)}
-      <PdfPage {page} />
-    {/each}
+  {#if pdf && documentId}
+    <PdfViewer {pdf} {documentId} />
   {:else}
     {#each nodes as node, i (i)}
       {#if node.type === 'word'}

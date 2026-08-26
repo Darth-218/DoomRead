@@ -1,44 +1,32 @@
 import * as pdfjsLib from 'pdfjs-dist'
 import PdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import ePub from 'epubjs'
-import type { PdfDocData, PdfPageData } from './stores.svelte'
+import type { PdfDocMeta, PdfPageMeta } from './stores.svelte'
 
 // PDF.js needs its worker wired up for the browser build (Vite resolves the
 // ?url import to the actual worker file).
 pdfjsLib.GlobalWorkerOptions.workerSrc = PdfWorker
 
-const PDF_RENDER_SCALE = 1.5
-
 export interface ImportResult {
   text: string
-  pdf?: PdfDocData
+  pdf?: PdfDocMeta
+  bytes?: Uint8Array
 }
 
 export async function extractPdf(file: File): Promise<ImportResult> {
-  const data = new Uint8Array(await file.arrayBuffer())
-  const pdf = await pdfjsLib.getDocument({ data }).promise
+  // Read the raw bytes once: used both for parsing and for persisting so the
+  // source panel can re-render pages on demand (no per-page images stored).
+  const bytes = new Uint8Array(await file.arrayBuffer())
+  const pdf = await pdfjsLib.getDocument({ data: bytes }).promise
 
-  const pages: PdfPageData[] = []
+  const pages: PdfPageMeta[] = []
   let base = ''
 
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i)
-    const viewport = page.getViewport({ scale: PDF_RENDER_SCALE })
-
-    // Rasterize the page once so the source panel can show the real PDF
-    // without re-opening the document later.
-    const canvas = document.createElement('canvas')
-    canvas.width = viewport.width
-    canvas.height = viewport.height
-    const ctx = canvas.getContext('2d')
-    if (ctx) {
-      try {
-        await page.render({ canvas, canvasContext: ctx, viewport }).promise
-      } catch {
-        // Page image is best-effort; text extraction still proceeds.
-      }
-    }
-    const image = canvas.toDataURL('image/jpeg', 0.85)
+    // Natural page size (scale 1) keeps stored metadata small; the viewer
+    // scales up when rendering.
+    const viewport = page.getViewport({ scale: 1 })
 
     const content = await page.getTextContent()
     const offsets: number[] = []
@@ -54,9 +42,8 @@ export async function extractPdf(file: File): Promise<ImportResult> {
     }
     if (i < pdf.numPages) base += '\n\n'
 
-    // Store only the minimal, structured-clone-safe fields the text layer
-    // needs. pdf.js v6 returns Proxy-wrapped arrays (e.g. `transform`), which
-    // IndexedDB cannot clone, so copy each value into a real primitive.
+    // Store only the minimal fields the text layer needs. pdf.js may wrap
+    // values (e.g. `transform`) in Proxies, so copy into real primitives.
     const items = content.items.map((it) => ({
       str: 'str' in it ? String(it.str) : undefined,
       transform:
@@ -67,15 +54,14 @@ export async function extractPdf(file: File): Promise<ImportResult> {
     }))
 
     pages.push({
-      image,
       width: viewport.width,
       height: viewport.height,
-      content: { items },
+      items,
       offsets,
     })
   }
 
-  return { text: base, pdf: { pages } }
+  return { text: base, pdf: { pages }, bytes }
 }
 
 export async function extractEpubText(file: File): Promise<string> {
