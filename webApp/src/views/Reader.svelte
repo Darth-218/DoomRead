@@ -250,6 +250,13 @@
     width: 5rem;
     font: inherit;
     padding: 0.2rem 0.4rem;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+  .wpm-control input::-webkit-outer-spin-button,
+  .wpm-control input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
   .wpm-control button {
     font: inherit;
