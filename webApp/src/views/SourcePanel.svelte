@@ -1,9 +1,7 @@
 <script lang="ts">
   import { readerBus, jumpTo } from '../lib/readerBus.svelte'
-  import type { PdfDocMeta } from '../lib/stores.svelte'
-  import PdfViewer from './PdfViewer.svelte'
 
-  let { text, pdf, documentId }: { text: string; pdf?: PdfDocMeta; documentId?: string } = $props()
+  let { text }: { text: string } = $props()
 
   interface Node {
     type: 'word' | 'text'
@@ -55,11 +53,8 @@
   })
 </script>
 
-<div class="source" class:pdf={!!pdf} bind:this={container}>
-  {#if pdf && documentId}
-    <PdfViewer {pdf} {documentId} />
-  {:else}
-    {#each nodes as node, i (i)}
+<div class="source" bind:this={container}>
+  {#each nodes as node, i (i)}
       {#if node.type === 'word'}
         <span
           class="word"
@@ -78,7 +73,6 @@
         <span class="text">{node.text}</span>
       {/if}
     {/each}
-  {/if}
 </div>
 
 <style>
@@ -98,11 +92,6 @@
   }
   .text {
     white-space: pre-wrap;
-  }
-  .source.pdf {
-    padding: 0;
-    border: none;
-    line-height: normal;
   }
   .word {
     cursor: pointer;

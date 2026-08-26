@@ -5,30 +5,11 @@
 import * as db from './db'
 import { LOREM_300 } from './lorem'
 
-export interface PdfTextItem {
-  str?: string
-  transform?: number[]
-  height?: number
-  [key: string]: unknown
-}
-
-export interface PdfPageMeta {
-  width: number
-  height: number
-  items: PdfTextItem[]
-  offsets: number[]
-}
-
-export interface PdfDocMeta {
-  pages: PdfPageMeta[]
-}
-
 export interface Document {
   id: string
   title: string
   text: string
   createdAt: string
-  pdf?: PdfDocMeta
 }
 
 export interface ReadingProgress {
@@ -76,40 +57,22 @@ export async function saveProgress(p: ReadingProgress): Promise<void> {
   if (p.documentId === appState.activeDocumentId) appState.progress = p
 }
 
-export async function addDocument(
-  title: string,
-  text: string,
-  pdf?: PdfDocMeta,
-  pdfBytes?: Uint8Array,
-): Promise<Document> {
-  // `pdf`/`pdfBytes` arrive wrapped in Svelte's $state reactivity Proxy;
-  // IndexedDB's structured clone cannot persist Proxies. `pdf` is copied via
-  // JSON, and `pdfBytes` via a plain Uint8Array copy (JSON would corrupt it).
-  const plainPdf = pdf ? (JSON.parse(JSON.stringify(pdf)) as PdfDocMeta) : undefined
-  const plainBytes = pdfBytes && pdfBytes.length > 0 ? Uint8Array.from(pdfBytes) : undefined
+export async function addDocument(title: string, text: string): Promise<Document> {
   const doc: Document = {
     id: crypto.randomUUID(),
     title: title.trim() || 'Untitled',
     text,
     createdAt: new Date().toISOString(),
-    pdf: plainPdf,
   }
   await db.put('documents', doc)
-  if (plainBytes) await db.put('pdfs', { id: doc.id, bytes: plainBytes })
   appState.documents = [...appState.documents, doc]
   return doc
-}
-
-export async function getPdfBytes(id: string): Promise<Uint8Array | undefined> {
-  const rec = await db.get<{ id: string; bytes: Uint8Array }>('pdfs', id)
-  return rec?.bytes
 }
 
 export async function deleteDocument(id: string): Promise<void> {
   await db.del('documents', id)
   await db.del('progress', id)
   await db.del('bookmarks', id)
-  await db.del('pdfs', id)
   appState.documents = appState.documents.filter((d) => d.id !== id)
   if (appState.activeDocumentId === id) {
     appState.activeDocumentId = null
