@@ -80,6 +80,12 @@
     start()
   }
 
+  function setWpm(v: number) {
+    const next = Number.isFinite(v) ? Math.min(1000, Math.max(100, Math.round(v))) : 300
+    wpm = next
+    rebuild()
+  }
+
   function toggle() {
     if (running) {
       stop()
@@ -192,7 +198,19 @@
 <button type="button" class="word" aria-label="Play or pause" onclick={toggle}>{word}</button>
 <div class="controls">
   <label for="wpm">WPM {wpm}</label>
-  <input id="wpm" type="range" min="100" max="1000" step="50" bind:value={wpm} oninput={() => rebuild()} />
+  <div class="wpm-control">
+    <button type="button" aria-label="Decrease speed" onclick={() => setWpm(wpm - 50)}>−50</button>
+    <input
+      id="wpm"
+      type="number"
+      min="100"
+      max="1000"
+      step="50"
+      value={wpm}
+      oninput={(e) => setWpm(+(e.currentTarget.value))}
+    />
+    <button type="button" aria-label="Increase speed" onclick={() => setWpm(wpm + 50)}>+50</button>
+  </div>
   <button onclick={toggle}>{running ? 'Pause' : finished ? 'Re-read' : 'Read'}</button>
 </div>
 <p class="meta">
@@ -222,6 +240,21 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+  }
+  .wpm-control {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .wpm-control input {
+    width: 5rem;
+    font: inherit;
+    padding: 0.2rem 0.4rem;
+  }
+  .wpm-control button {
+    font: inherit;
+    padding: 0.2rem 0.6rem;
+    cursor: pointer;
   }
   .meta {
     color: #666;
