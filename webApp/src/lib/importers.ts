@@ -32,7 +32,11 @@ export async function extractPdf(file: File): Promise<ImportResult> {
     canvas.height = viewport.height
     const ctx = canvas.getContext('2d')
     if (ctx) {
-      await page.render({ canvas, canvasContext: ctx, viewport }).promise
+      try {
+        await page.render({ canvas, canvasContext: ctx, viewport }).promise
+      } catch {
+        // Page image is best-effort; text extraction still proceeds.
+      }
     }
     const image = canvas.toDataURL('image/jpeg', 0.85)
 
@@ -50,11 +54,19 @@ export async function extractPdf(file: File): Promise<ImportResult> {
     }
     if (i < pdf.numPages) base += '\n\n'
 
+    // Store only the minimal, structured-clone-safe fields the text layer
+    // needs (raw pdfjs content also carries non-serializable metadata).
+    const items = content.items.map((it) => ({
+      str: 'str' in it ? it.str : undefined,
+      transform: 'transform' in it ? it.transform : undefined,
+      height: 'height' in it ? it.height : undefined,
+    }))
+
     pages.push({
       image,
       width: viewport.width,
       height: viewport.height,
-      content,
+      content: { items },
       offsets,
     })
   }

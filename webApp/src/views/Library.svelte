@@ -35,11 +35,15 @@
       return
     }
     importError = ''
-    const doc = await addDocument(importTitle, importText, importPdf)
-    importText = ''
-    importTitle = ''
-    importPdf = undefined
-    onOpen(doc.id)
+    try {
+      const doc = await addDocument(importTitle, importText, importPdf)
+      importText = ''
+      importTitle = ''
+      importPdf = undefined
+      onOpen(doc.id)
+    } catch (err) {
+      importError = `Could not save document: ${err instanceof Error ? err.message : String(err)}`
+    }
   }
 
   async function remove(id: string) {
