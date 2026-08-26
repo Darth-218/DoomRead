@@ -57,6 +57,18 @@ export async function saveProgress(p: ReadingProgress): Promise<void> {
   if (p.documentId === appState.activeDocumentId) appState.progress = p
 }
 
+export async function addDocument(title: string, text: string): Promise<Document> {
+  const doc: Document = {
+    id: crypto.randomUUID(),
+    title: title.trim() || 'Untitled',
+    text,
+    createdAt: new Date().toISOString(),
+  }
+  await db.put('documents', doc)
+  appState.documents = [...appState.documents, doc]
+  return doc
+}
+
 async function ensureSample(): Promise<void> {
   if (await db.get<Document>('documents', 'lorem-300')) return
   await db.put('documents', {
