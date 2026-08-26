@@ -55,11 +55,15 @@ export async function extractPdf(file: File): Promise<ImportResult> {
     if (i < pdf.numPages) base += '\n\n'
 
     // Store only the minimal, structured-clone-safe fields the text layer
-    // needs (raw pdfjs content also carries non-serializable metadata).
+    // needs. pdf.js v6 returns Proxy-wrapped arrays (e.g. `transform`), which
+    // IndexedDB cannot clone, so copy each value into a real primitive.
     const items = content.items.map((it) => ({
-      str: 'str' in it ? it.str : undefined,
-      transform: 'transform' in it ? it.transform : undefined,
-      height: 'height' in it ? it.height : undefined,
+      str: 'str' in it ? String(it.str) : undefined,
+      transform:
+        'transform' in it && Array.isArray(it.transform)
+          ? (it.transform as number[]).slice()
+          : undefined,
+      height: 'height' in it ? Number(it.height) : undefined,
     }))
 
     pages.push({
