@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { addDocument, type Document } from '../lib/stores.svelte'
+  import { addDocument, deleteDocument, type Document } from '../lib/stores.svelte'
+  import { importTextFor } from '../lib/importers'
 
   let { documents, onOpen }: { documents: Document[]; onOpen: (id: string) => void } = $props()
 
@@ -36,6 +37,11 @@
     importTitle = ''
     onOpen(doc.id)
   }
+
+  async function remove(id: string) {
+    if (!confirm('Delete this document? This cannot be undone.')) return
+    await deleteDocument(id)
+  }
 </script>
 
 <div class="library">
@@ -71,7 +77,10 @@
       {#each documents as doc (doc.id)}
         <li>
           <span class="title">{doc.title}</span>
-          <button onclick={() => onOpen(doc.id)}>Open</button>
+          <span class="actions">
+            <button onclick={() => onOpen(doc.id)}>Open</button>
+            <button class="remove" onclick={() => remove(doc.id)}>Remove</button>
+          </span>
         </li>
       {/each}
     </ul>
@@ -150,6 +159,11 @@
     border: 1px solid #ddd;
     border-radius: 0.5rem;
   }
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
   li .title {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -165,5 +179,8 @@
     padding: 0.4rem 0.9rem;
     border-radius: 0.4rem;
     flex-shrink: 0;
+  }
+  button.remove {
+    background: #e02424;
   }
 </style>

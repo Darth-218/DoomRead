@@ -69,6 +69,17 @@ export async function addDocument(title: string, text: string): Promise<Document
   return doc
 }
 
+export async function deleteDocument(id: string): Promise<void> {
+  await db.del('documents', id)
+  await db.del('progress', id)
+  await db.del('bookmarks', id)
+  appState.documents = appState.documents.filter((d) => d.id !== id)
+  if (appState.activeDocumentId === id) {
+    appState.activeDocumentId = null
+    appState.progress = null
+  }
+}
+
 async function ensureSample(): Promise<void> {
   if (await db.get<Document>('documents', 'lorem-300')) return
   await db.put('documents', {
