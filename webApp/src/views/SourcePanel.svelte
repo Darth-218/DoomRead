@@ -6,7 +6,7 @@
   interface Node {
     type: 'word' | 'text'
     text: string
-    offset?: number
+    offset: number
   }
 
   // Mirror the core tokenizer's notion of a "word char" so the offsets we
@@ -16,32 +16,57 @@
     return /\p{L}|\p{N}/u.test(ch) || intra.includes(ch)
   }
 
+  // Build lightweight word/text chunks. Every node carries its start offset so
+  // the list stays monotonic and can be binary-searched for the active word.
   function build(source: string): Node[] {
     const nodes: Node[] = []
     let i = 0
     const n = source.length
     while (i < n) {
-      if (isWordChar(source[i])) {
-        const start = i
-        let buf = ''
-        while (i < n && isWordChar(source[i])) {
-          buf += source[i]
-          i++
-        }
-        nodes.push({ type: 'word', text: buf, offset: start })
-      } else {
-        let buf = ''
-        while (i < n && !isWordChar(source[i])) {
-          buf += source[i]
-          i++
-        }
-        nodes.push({ type: 'text', text: buf })
+      const start = i
+      const word = isWordChar(source[i])
+      let buf = ''
+      while (i < n && isWordChar(source[i]) === word) {
+        buf += source[i]
+        i++
       }
+      nodes.push({ type: word ? 'word' : 'text', text: buf, offset: start })
     }
     return nodes
   }
 
+  // Only render a window of words around the current reading position so the
+  // DOM stays bounded no matter how long the document is.
+  const WINDOW_BEFORE = 100
+  const WINDOW_AFTER = 300
+
+  // Largest index whose node starts at or before `offset` (nodes are sorted).
+  function indexForOffset(nodes: Node[], offset: number): number {
+    let lo = 0
+    let hi = nodes.length - 1
+    let res = 0
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1
+      if (nodes[mid].offset <= offset) {
+        res = mid
+        lo = mid + 1
+      } else {
+        hi = mid - 1
+      }
+    }
+    return res
+  }
+
   const nodes = $derived(build(text))
+  const activeIdx = $derived(indexForOffset(nodes, readerBus.currentOffset))
+  const visible = $derived(
+    nodes.length === 0
+      ? []
+      : nodes.slice(
+          Math.max(0, activeIdx - WINDOW_BEFORE),
+          Math.min(nodes.length, activeIdx + WINDOW_AFTER + 1),
+        ),
+  )
 
   let container: HTMLElement | null = $state(null)
 
@@ -54,7 +79,7 @@
 </script>
 
 <div class="source" bind:this={container}>
-  {#each nodes as node, i (i)}
+  {#each visible as node (node.offset)}
       {#if node.type === 'word'}
         <span
           class="word"
@@ -62,9 +87,9 @@
           data-offset={node.offset}
           role="button"
           tabindex="0"
-          onclick={() => node.offset !== undefined && jumpTo(node.offset)}
+          onclick={() => jumpTo(node.offset)}
           onkeydown={(e) => {
-            if ((e.key === 'Enter' || e.key === ' ') && node.offset !== undefined) {
+            if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault()
               jumpTo(node.offset)
             }
