@@ -5,6 +5,7 @@
   import Stats from './views/Stats.svelte'
   import Settings from './views/Settings.svelte'
   import SpaceTest from './views/SpaceTest.svelte'
+  import SourcePanel from './views/SourcePanel.svelte'
   import { getActiveDoc, init, openDocument, appState } from './lib/stores.svelte'
 
   type View = 'reader' | 'library' | 'stats' | 'settings' | 'spacetest'
@@ -47,9 +48,12 @@
     <p class="meta">opening…</p>
   {:else if view === 'reader'}
     {#if activeDoc}
-      {#key appState.activeDocumentId}
-        <Reader document={activeDoc} />
-      {/key}
+      <div class="reading">
+        {#key appState.activeDocumentId}
+          <Reader document={activeDoc} />
+          <SourcePanel text={activeDoc.text} />
+        {/key}
+      </div>
     {:else}
       <p class="meta">No document open. Pick one in the Library.</p>
     {/if}
@@ -102,5 +106,16 @@
     align-items: center;
     gap: 1rem;
     padding: 3rem 1rem;
+  }
+  .reading {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1100px;
+  }
+  .reading > :global(.reader) {
+    flex: 0 0 360px;
+    max-width: 360px;
   }
 </style>

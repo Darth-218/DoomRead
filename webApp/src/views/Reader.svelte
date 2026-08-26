@@ -3,6 +3,7 @@
   import { core } from '../lib/core/api'
   import { refreshProgress, saveProgress, appState } from '../lib/stores.svelte'
   import type { Document } from '../lib/stores.svelte'
+  import { setCurrentOffset, setJumpHandler } from '../lib/readerBus.svelte'
 
   let { document }: { document: Document } = $props()
 
@@ -11,6 +12,7 @@
   interface StepRow {
     display: string
     durationMs: number
+    offset: number
   }
 
   let steps: StepRow[] = $state([])
@@ -107,7 +109,11 @@
     const wasRunning = running
     const wasFinished = finished
     stop()
-    steps = core.schedule(TEXT, wpm)
+    steps = core.schedule(TEXT, wpm).map((s) => ({
+      display: s.display,
+      durationMs: toMs(s.durationMs),
+      offset: s.offset,
+    }))
     let next = preferredIndex ?? idx
     if (preferredIndex === undefined && wasFinished) next = 0
     idx = Math.max(0, Math.min(next, steps.length - 1))
@@ -117,7 +123,25 @@
     else if (preferredIndex === undefined) persist()
   }
 
+  // Publish the source char offset of the word currently shown so the
+  // SourcePanel can highlight and scroll to it.
+  $effect(() => {
+    setCurrentOffset(steps[idx]?.offset ?? 0)
+  })
+
   onMount(() => {
+    setJumpHandler((offset: number) => {
+      const i = steps.findIndex((s) => s.offset === offset)
+      if (i < 0) return
+      const wasRunning = running
+      stop()
+      idx = i
+      word = steps[i].display
+      finished = false
+      if (wasRunning) start()
+      persist()
+    })
+
     void (async () => {
       await refreshProgress(document.id)
       const saved = appState.progress
@@ -188,6 +212,7 @@
     window.addEventListener('blur', release)
     return () => {
       stop()
+      setJumpHandler(null)
       window.removeEventListener('keydown', onDown)
       window.removeEventListener('keyup', onUp)
       window.removeEventListener('blur', release)
@@ -195,7 +220,7 @@
   })
 </script>
 
-<button type="button" class="word" aria-label="Play or pause" onclick={toggle}>{word}</button>
+<button type="button" class="word reader" aria-label="Play or pause" onclick={toggle}>{word}</button>
 <div class="controls">
   <label for="wpm">WPM {wpm}</label>
   <div class="wpm-control">
