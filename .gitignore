@@ -17,6 +17,7 @@ node_modules/
 webApp/dist/
 webApp/.svelte-kit/
 webApp/.vite/
+webApp/src/lib/core/
 
 # Kotlin
 .kotlin/
