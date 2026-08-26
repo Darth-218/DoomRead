@@ -1,5 +1,6 @@
 package dev.doomread.core.backup
 
+import kotlin.js.JsExport
 import kotlinx.serialization.Serializable
 
 const val BACKUP_FORMAT = "doomread-backup"
@@ -14,6 +15,7 @@ data class BackupEnvelope(
 )
 
 @Serializable
+@JsExport
 data class BackupData(
     val documents: List<DocumentEntry> = emptyList(),
     val progress: List<ProgressEntry> = emptyList(),
@@ -23,16 +25,21 @@ data class BackupData(
 )
 
 @Serializable
+@JsExport
 data class DocumentEntry(val id: String, val title: String, val kind: String)
 
 @Serializable
+@JsExport
 data class ProgressEntry(val documentId: String, val stepIndex: Int, val updatedAt: String)
 
 @Serializable
+@JsExport
 data class BookmarkEntry(val documentId: String, val stepIndex: Int, val note: String = "")
 
 @Serializable
+@JsExport
 data class SessionStatsEntry(val date: String, val wordsRead: Int, val wpm: Int, val durationMs: Long)
 
 @Serializable
+@JsExport
 data class SettingsEntry(val wpm: Int = 300, val theme: String = "default", val font: String = "sans", val displayMode: String = "light")

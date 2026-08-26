@@ -2,7 +2,9 @@ package dev.doomread.core.pacing
 
 import dev.doomread.core.tokenizer.Token
 import dev.doomread.core.tokenizer.TokenKind
+import kotlin.js.JsExport
 
+@JsExport
 data class Step(val display: String, val durationMs: Long)
 
 object PacingEngine {
