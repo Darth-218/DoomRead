@@ -83,9 +83,10 @@ export async function addDocument(
   pdfBytes?: Uint8Array,
 ): Promise<Document> {
   // `pdf`/`pdfBytes` arrive wrapped in Svelte's $state reactivity Proxy;
-  // IndexedDB's structured clone cannot persist Proxies, so deep-clone to
-  // plain data.
+  // IndexedDB's structured clone cannot persist Proxies. `pdf` is copied via
+  // JSON, and `pdfBytes` via a plain Uint8Array copy (JSON would corrupt it).
   const plainPdf = pdf ? (JSON.parse(JSON.stringify(pdf)) as PdfDocMeta) : undefined
+  const plainBytes = pdfBytes && pdfBytes.length > 0 ? Uint8Array.from(pdfBytes) : undefined
   const doc: Document = {
     id: crypto.randomUUID(),
     title: title.trim() || 'Untitled',
@@ -94,7 +95,7 @@ export async function addDocument(
     pdf: plainPdf,
   }
   await db.put('documents', doc)
-  if (pdfBytes) await db.put('pdfs', { id: doc.id, bytes: pdfBytes })
+  if (plainBytes) await db.put('pdfs', { id: doc.id, bytes: plainBytes })
   appState.documents = [...appState.documents, doc]
   return doc
 }
