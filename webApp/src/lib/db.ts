@@ -2,7 +2,7 @@
 let _db: IDBDatabase | null = null
 
 const DB_NAME = 'doomread'
-const DB_VERSION = 1
+const DB_VERSION = 2
 
 const STORES = ['documents', 'progress', 'bookmarks', 'stats', 'settings', 'pdfs'] as const
 

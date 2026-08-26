@@ -56,7 +56,7 @@
 >
   <canvas bind:this={canvas} class="page-canvas"></canvas>
   <div class="textLayer">
-    {#each meta.items as it, idx}
+    {#each (meta.items ?? []) as it, idx}
       {#if it.str}
         {@const offset = meta.offsets[idx]}
         {@const t = it.transform ?? [0, 0, 0, 0, 0, 0]}
