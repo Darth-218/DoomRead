@@ -31,7 +31,8 @@
 
   async function add() {
     if (!importText.trim()) {
-      importError = 'Paste some text or choose a file first.'
+      // Don't mask a prior file-read failure with a misleading prompt.
+      if (!importError) importError = 'Paste some text or choose a file first.'
       return
     }
     importError = ''
