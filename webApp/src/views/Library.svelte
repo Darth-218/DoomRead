@@ -8,6 +8,7 @@
   let importTitle = $state('')
   let importError = $state('')
   let busy = $state(false)
+  let cleanPdf = $state(true)
 
   async function onFile(e: Event) {
     const input = e.currentTarget as HTMLInputElement
@@ -16,7 +17,7 @@
     importError = ''
     busy = true
     try {
-      const res = await importFor(file)
+      const res = await importFor(file, { clean: cleanPdf })
       importText = res.text
       if (!importTitle) importTitle = file.name.replace(/\.[^.]+$/, '')
     } catch (err) {
@@ -69,6 +70,10 @@
         {busy ? 'Reading…' : 'Add document'}
       </button>
     </div>
+    <label class="opt">
+      <input type="checkbox" bind:checked={cleanPdf} />
+      Clean PDF (remove headers, page numbers, boilerplate)
+    </label>
     {#if importError}
       <p class="error">{importError}</p>
     {/if}
@@ -136,6 +141,13 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
+  }
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: #555;
   }
   .error {
     color: #e02424;
