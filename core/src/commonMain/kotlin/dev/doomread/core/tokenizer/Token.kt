@@ -7,4 +7,5 @@ data class Token(
     val kind: TokenKind,
     val index: Int,
     val wordIndex: Int = -1,
+    val offset: Int = 0,
 )

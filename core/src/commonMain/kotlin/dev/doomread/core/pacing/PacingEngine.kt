@@ -5,7 +5,7 @@ import dev.doomread.core.tokenizer.TokenKind
 import kotlin.js.JsExport
 
 @JsExport
-data class Step(val display: String, val durationMs: Long)
+data class Step(val display: String, val durationMs: Long, val offset: Int = 0)
 
 object PacingEngine {
 
@@ -24,7 +24,7 @@ object PacingEngine {
                     TokenKind.SENTENCE_PUNCT -> ms += config.sentencePauseMs
                     else -> {}
                 }
-                add(Step(t.text, ms.toLong()))
+                add(Step(t.text, ms.toLong(), t.offset))
             }
         }
     }

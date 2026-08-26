@@ -14,7 +14,7 @@ import kotlin.js.JsExport
  * Double keeps setTimeout math simple in the browser.
  */
 @JsExport
-data class ScheduleStep(val display: String, val durationMs: Double)
+data class ScheduleStep(val display: String, val durationMs: Double, val offset: Int = 0)
 
 /**
  * Primitive-friendly entry points for the Web UI.
@@ -28,7 +28,7 @@ object WebApi {
 
     fun schedule(text: String, wpm: Int): Array<ScheduleStep> =
         PacingEngine.buildSchedule(Tokenizer.tokenize(text), PacingConfig(wpm = wpm))
-            .map { ScheduleStep(it.display, it.durationMs.toDouble()) }
+            .map { ScheduleStep(it.display, it.durationMs.toDouble(), it.offset) }
             .toTypedArray()
 
     fun sentenceStarts(text: String): Array<Int> =

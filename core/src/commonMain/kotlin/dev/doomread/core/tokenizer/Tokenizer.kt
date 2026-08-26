@@ -9,32 +9,37 @@ object Tokenizer {
         val out = mutableListOf<Token>()
         val word = StringBuilder()
         var wordCount = 0
+        var pos = 0
+        var wordStart = 0
 
         fun flush() {
             if (word.isNotEmpty()) {
-                out += Token(word.toString(), TokenKind.WORD, out.size, wordCount++)
+                out += Token(word.toString(), TokenKind.WORD, out.size, wordCount++, wordStart)
                 word.clear()
             }
         }
 
         for (ch in text) {
             when {
-                ch.isLetterOrDigit() || ch.isCombiningMark() || ch in INTRA_WORD ->
+                ch.isLetterOrDigit() || ch.isCombiningMark() || ch in INTRA_WORD -> {
+                    if (word.isEmpty()) wordStart = pos
                     word.append(ch)
+                }
                 ch in SENTENCE_END -> {
                     flush()
-                    out += Token(ch.toString(), TokenKind.SENTENCE_PUNCT, out.size)
+                    out += Token(ch.toString(), TokenKind.SENTENCE_PUNCT, out.size, -1, pos)
                 }
                 ch in CLAUSE_PUNCT -> {
                     flush()
-                    out += Token(ch.toString(), TokenKind.CLAUSE_PUNCT, out.size)
+                    out += Token(ch.toString(), TokenKind.CLAUSE_PUNCT, out.size, -1, pos)
                 }
                 ch.isWhitespace() -> flush()
                 else -> {
                     flush()
-                    out += Token(ch.toString(), TokenKind.CLAUSE_PUNCT, out.size)
+                    out += Token(ch.toString(), TokenKind.CLAUSE_PUNCT, out.size, -1, pos)
                 }
             }
+            pos++
         }
         flush()
         return out
