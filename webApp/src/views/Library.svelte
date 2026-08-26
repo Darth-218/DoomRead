@@ -6,13 +6,23 @@
   let importText = $state('')
   let importTitle = $state('')
   let importError = $state('')
+  let busy = $state(false)
 
   async function onFile(e: Event) {
     const input = e.currentTarget as HTMLInputElement
     const file = input.files?.[0]
     if (!file) return
-    importText = await file.text()
-    if (!importTitle) importTitle = file.name.replace(/\.[^.]+$/, '')
+    importError = ''
+    busy = true
+    try {
+      const { importTextFor } = await import('../lib/importers')
+      importText = await importTextFor(file)
+      if (!importTitle) importTitle = file.name.replace(/\.[^.]+$/, '')
+    } catch (err) {
+      importError = `Could not read file: ${err instanceof Error ? err.message : String(err)}`
+    } finally {
+      busy = false
+    }
   }
 
   async function add() {
@@ -44,8 +54,10 @@
       bind:value={importText}
     ></textarea>
     <div class="row">
-      <input type="file" accept=".txt,.md,text/plain" onchange={onFile} />
-      <button class="add" onclick={add}>Add document</button>
+      <input type="file" accept=".txt,.md,.pdf,.epub,text/plain" onchange={onFile} />
+      <button class="add" onclick={add} disabled={busy}>
+        {busy ? 'Reading…' : 'Add document'}
+      </button>
     </div>
     {#if importError}
       <p class="error">{importError}</p>
