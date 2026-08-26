@@ -6,8 +6,14 @@ import ePub from 'epubjs'
 // ?url import to the actual worker file).
 pdfjsLib.GlobalWorkerOptions.workerSrc = PdfWorker
 
+export interface ChapterMeta {
+  title: string
+  offset: number
+}
+
 export interface ImportResult {
   text: string
+  chapters?: ChapterMeta[]
 }
 
 export interface ImportOptions {
@@ -107,21 +113,47 @@ export async function extractPdf(
   return { text }
 }
 
-export async function extractEpubText(file: File): Promise<string> {
+export async function extractEpub(file: File): Promise<ImportResult> {
   const data = await file.arrayBuffer()
   const book = ePub()
   await book.open(data)
-  const items = await book.loaded.spine
-  const parts: string[] = []
-  for (const item of items) {
-    if (!item.href) continue
-    const section = book.section(item.href)
-    const doc = await section.load(book.load.bind(book))
-    const text = doc?.body?.textContent ?? ''
-    if (text.trim()) parts.push(text)
-    section.unload()
+
+  // Map each section's href (without fragment) to its TOC label so chapters
+  // get readable titles instead of generic "Chapter N".
+  const tocByHref = new Map<string, string>()
+  const walk = (items: any[]) => {
+    for (const it of items) {
+      const base = (it.href || '').split('#')[0]
+      if (base && !tocByHref.has(base)) tocByHref.set(base, it.label)
+      if (it.subitems) walk(it.subitems)
+    }
   }
-  return parts.join('\n\n')
+  try {
+    const nav = await book.loaded.navigation
+    walk((nav?.toc ?? []) as any[])
+  } catch {
+    // No navigation document — chapters fall back to "Chapter N".
+  }
+
+  const items = (await book.loaded.spine) as any[]
+  let text = ''
+  const chapters: ChapterMeta[] = []
+  for (const item of items) {
+    if (!item.href || item.linear === 'no') continue
+    const section = book.section(item.href)
+    if (!section) continue
+    const doc = await section.load(book.load.bind(book))
+    const t = (doc?.body?.textContent ?? '').trim()
+    section.unload()
+    if (!t) continue
+    const base = item.href.split('#')[0]
+    const title = tocByHref.get(base) ?? `Chapter ${chapters.length + 1}`
+    if (text) text += '\n\n'
+    const offset = text.length
+    text += t
+    chapters.push({ title, offset })
+  }
+  return { text, chapters }
 }
 
 export async function importFor(
@@ -130,6 +162,6 @@ export async function importFor(
 ): Promise<ImportResult> {
   const lower = file.name.toLowerCase()
   if (lower.endsWith('.pdf')) return extractPdf(file, opts)
-  if (lower.endsWith('.epub')) return { text: await extractEpubText(file) }
+  if (lower.endsWith('.epub')) return extractEpub(file)
   return { text: await file.text() }
 }

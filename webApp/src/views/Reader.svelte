@@ -131,7 +131,9 @@
 
   onMount(() => {
     setJumpHandler((offset: number) => {
-      const i = steps.findIndex((s) => s.offset === offset)
+      // Seek to the first step at or after the target offset (chapter starts
+      // may land on whitespace, so an exact match isn't guaranteed).
+      const i = steps.findIndex((s) => s.offset >= offset)
       if (i < 0) return
       const wasRunning = running
       stop()

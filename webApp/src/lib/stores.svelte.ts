@@ -5,11 +5,17 @@
 import * as db from './db'
 import { LOREM_300 } from './lorem'
 
+export interface ChapterMeta {
+  title: string
+  offset: number
+}
+
 export interface Document {
   id: string
   title: string
   text: string
   createdAt: string
+  chapters?: ChapterMeta[]
 }
 
 export interface ReadingProgress {
@@ -57,12 +63,17 @@ export async function saveProgress(p: ReadingProgress): Promise<void> {
   if (p.documentId === appState.activeDocumentId) appState.progress = p
 }
 
-export async function addDocument(title: string, text: string): Promise<Document> {
+export async function addDocument(
+  title: string,
+  text: string,
+  chapters?: ChapterMeta[],
+): Promise<Document> {
   const doc: Document = {
     id: crypto.randomUUID(),
     title: title.trim() || 'Untitled',
     text,
     createdAt: new Date().toISOString(),
+    chapters,
   }
   await db.put('documents', doc)
   appState.documents = [...appState.documents, doc]

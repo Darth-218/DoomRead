@@ -6,6 +6,7 @@
   import Settings from './views/Settings.svelte'
   import SpaceTest from './views/SpaceTest.svelte'
   import SourcePanel from './views/SourcePanel.svelte'
+  import ChapterList from './views/ChapterList.svelte'
   import { getActiveDoc, init, openDocument, appState } from './lib/stores.svelte'
 
   type View = 'reader' | 'library' | 'stats' | 'settings' | 'spacetest'
@@ -48,6 +49,9 @@
     <p class="meta">opening…</p>
   {:else if view === 'reader'}
     {#if activeDoc}
+      {#if activeDoc.chapters?.length}
+        <ChapterList chapters={activeDoc.chapters} />
+      {/if}
       <div class="reading">
         {#key appState.activeDocumentId}
           <div class="pane"><Reader document={activeDoc} /></div>
