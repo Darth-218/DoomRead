@@ -55,7 +55,7 @@
       <div class="reading">
         {#key appState.activeDocumentId}
           <div class="pane"><Reader document={activeDoc} /></div>
-          <SourcePanel text={activeDoc.text} />
+          <SourcePanel text={activeDoc.text ?? ''} />
         {/key}
       </div>
     {:else}

@@ -10,11 +10,20 @@ export interface ChapterMeta {
   offset: number
 }
 
+// Metadata only — the heavy `text`/`chapters` live in the `contents` store
+// and are loaded lazily when a document is opened (see loadContent).
 export interface Document {
   id: string
   title: string
-  text: string
   createdAt: string
+  text?: string
+  chapters?: ChapterMeta[]
+}
+
+// Full extracted content, kept out of the in-memory document list.
+export interface Content {
+  id: string
+  text: string
   chapters?: ChapterMeta[]
 }
 
@@ -28,26 +37,52 @@ export interface ReadingProgress {
 export const appState = $state({
   documents: [] as Document[],
   activeDocumentId: null as string | null,
+  activeContent: null as Content | null,
   progress: null as ReadingProgress | null,
   ready: false,
 })
 
 export function getActiveDoc(): Document | null {
-  return appState.documents.find((d) => d.id === appState.activeDocumentId) ?? null
+  const meta = appState.documents.find((d) => d.id === appState.activeDocumentId)
+  if (!meta) return null
+  // Merge the lazily-loaded content so consumers see a full document.
+  return {
+    ...meta,
+    text: appState.activeContent?.text ?? meta.text ?? '',
+    chapters: appState.activeContent?.chapters ?? meta.chapters,
+  }
+}
+
+// Load a document's full text/chapters. New documents store them in the
+// `contents` store; older records may still carry `text` on the document
+// itself, so fall back to that for backward compatibility.
+export async function loadContent(id: string): Promise<Content> {
+  const stored = await db.get<Content>('contents', id)
+  if (stored) return { id, text: stored.text ?? '', chapters: stored.chapters }
+  const doc = await db.get<Document>('documents', id)
+  return { id, text: doc?.text ?? '', chapters: doc?.chapters }
 }
 
 export async function init(): Promise<void> {
   await db.open()
   await ensureSample()
-  appState.documents = await db.getAll<Document>('documents')
+  // Load metadata only; text stays in the `contents` store until opened.
+  appState.documents = (await db.getAll<Document>('documents')).map((d) => ({
+    ...d,
+    text: undefined,
+    chapters: undefined,
+  }))
   if (appState.activeDocumentId === null && appState.documents.length > 0) {
     appState.activeDocumentId = appState.documents[0].id
   }
-  await refreshProgress()
+  if (appState.activeDocumentId) await openDocument(appState.activeDocumentId)
   appState.ready = true
 }
 
 export async function openDocument(id: string): Promise<void> {
+  // Load content before switching the active id so the reader mounts with
+  // text already available (avoids a blank first render).
+  appState.activeContent = await loadContent(id)
   appState.activeDocumentId = id
   await refreshProgress()
 }
@@ -68,25 +103,28 @@ export async function addDocument(
   text: string,
   chapters?: ChapterMeta[],
 ): Promise<Document> {
+  const id = crypto.randomUUID()
   const doc: Document = {
-    id: crypto.randomUUID(),
+    id,
     title: title.trim() || 'Untitled',
-    text,
     createdAt: new Date().toISOString(),
-    chapters,
   }
   await db.put('documents', doc)
+  // Keep the heavy text out of the document list.
+  await db.put('contents', { id, text, chapters } satisfies Content)
   appState.documents = [...appState.documents, doc]
-  return doc
+  return { ...doc, text, chapters }
 }
 
 export async function deleteDocument(id: string): Promise<void> {
   await db.del('documents', id)
+  await db.del('contents', id)
   await db.del('progress', id)
   await db.del('bookmarks', id)
   appState.documents = appState.documents.filter((d) => d.id !== id)
   if (appState.activeDocumentId === id) {
     appState.activeDocumentId = null
+    appState.activeContent = null
     appState.progress = null
   }
 }
@@ -96,7 +134,10 @@ async function ensureSample(): Promise<void> {
   await db.put('documents', {
     id: 'lorem-300',
     title: 'Lorem Ipsum (sample)',
-    text: LOREM_300,
     createdAt: new Date().toISOString(),
   })
+  await db.put('contents', {
+    id: 'lorem-300',
+    text: LOREM_300,
+  } satisfies Content)
 }

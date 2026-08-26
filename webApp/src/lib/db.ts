@@ -2,9 +2,9 @@
 let _db: IDBDatabase | null = null
 
 const DB_NAME = 'doomread'
-const DB_VERSION = 2
+const DB_VERSION = 3
 
-const STORES = ['documents', 'progress', 'bookmarks', 'stats', 'settings'] as const
+const STORES = ['documents', 'progress', 'bookmarks', 'stats', 'settings', 'contents'] as const
 
 export type StoreName = (typeof STORES)[number]
 
@@ -19,6 +19,8 @@ function keyPathFor(name: StoreName): string {
     case 'stats':
       return 'date'
     case 'settings':
+      return 'id'
+    case 'contents':
       return 'id'
   }
 }

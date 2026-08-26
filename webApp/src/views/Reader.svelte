@@ -7,7 +7,7 @@
 
   let { document }: { document: Document } = $props()
 
-  const TEXT = $derived(document.text)
+  const TEXT = $derived(document.text ?? '')
 
   interface StepRow {
     display: string
