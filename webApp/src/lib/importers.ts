@@ -16,8 +16,11 @@ export interface ImportResult {
 export async function extractPdf(file: File): Promise<ImportResult> {
   // Read the raw bytes once: used both for parsing and for persisting so the
   // source panel can re-render pages on demand (no per-page images stored).
-  const bytes = new Uint8Array(await file.arrayBuffer())
-  const pdf = await pdfjsLib.getDocument({ data: bytes }).promise
+  const raw = new Uint8Array(await file.arrayBuffer())
+  // Keep a pristine copy: pdf.js transfers/neuters the buffer it is given, so
+  // by the time we persist it the original would be empty.
+  const bytes = raw.slice()
+  const pdf = await pdfjsLib.getDocument({ data: raw }).promise
 
   const pages: PdfPageMeta[] = []
   let base = ''
