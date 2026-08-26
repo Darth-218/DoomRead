@@ -87,12 +87,15 @@ export async function addDocument(
   text: string,
   pdf?: PdfDocData,
 ): Promise<Document> {
+  // `pdf` arrives wrapped in Svelte's $state reactivity Proxy; IndexedDB's
+  // structured clone cannot persist Proxies, so deep-clone to plain data.
+  const plainPdf = pdf ? (JSON.parse(JSON.stringify(pdf)) as PdfDocData) : undefined
   const doc: Document = {
     id: crypto.randomUUID(),
     title: title.trim() || 'Untitled',
     text,
     createdAt: new Date().toISOString(),
-    pdf,
+    pdf: plainPdf,
   }
   await db.put('documents', doc)
   appState.documents = [...appState.documents, doc]
