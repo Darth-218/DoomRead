@@ -119,7 +119,11 @@ export async function extractEpub(file: File): Promise<ImportResult> {
   await book.open(data)
 
   // Map each section's href (without fragment) to its TOC label so chapters
-  // get readable titles instead of generic "Chapter N".
+  // get readable titles instead of generic "Chapter N". `book.navigation`
+  // starts undefined and is only populated after navigation loads, so read the
+  // resolved `loaded.navigation` promise and never touch `book.navigation`
+  // directly. Guard everything so a missing/absent TOC just yields fallback
+  // titles rather than throwing.
   const tocByHref = new Map<string, string>()
   const walk = (items: any[]) => {
     for (const it of items) {
@@ -129,8 +133,9 @@ export async function extractEpub(file: File): Promise<ImportResult> {
     }
   }
   try {
-    const nav = await book.loaded.navigation
-    walk((nav?.toc ?? []) as any[])
+    const loaded = (book as any).loaded
+    const nav = loaded?.navigation ? await loaded.navigation : (book as any).navigation
+    if (nav && Array.isArray(nav.toc)) walk(nav.toc as any[])
   } catch {
     // No navigation document — chapters fall back to "Chapter N".
   }
