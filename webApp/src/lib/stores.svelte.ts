@@ -5,11 +5,36 @@
 import * as db from './db'
 import { LOREM_300 } from './lorem'
 
+export interface PdfTextItem {
+  str?: string
+  transform?: number[]
+  height?: number
+  [key: string]: unknown
+}
+
+export interface PdfTextContent {
+  items: PdfTextItem[]
+  [key: string]: unknown
+}
+
+export interface PdfPageData {
+  image: string
+  width: number
+  height: number
+  content: PdfTextContent
+  offsets: number[]
+}
+
+export interface PdfDocData {
+  pages: PdfPageData[]
+}
+
 export interface Document {
   id: string
   title: string
   text: string
   createdAt: string
+  pdf?: PdfDocData
 }
 
 export interface ReadingProgress {
@@ -57,12 +82,17 @@ export async function saveProgress(p: ReadingProgress): Promise<void> {
   if (p.documentId === appState.activeDocumentId) appState.progress = p
 }
 
-export async function addDocument(title: string, text: string): Promise<Document> {
+export async function addDocument(
+  title: string,
+  text: string,
+  pdf?: PdfDocData,
+): Promise<Document> {
   const doc: Document = {
     id: crypto.randomUUID(),
     title: title.trim() || 'Untitled',
     text,
     createdAt: new Date().toISOString(),
+    pdf,
   }
   await db.put('documents', doc)
   appState.documents = [...appState.documents, doc]

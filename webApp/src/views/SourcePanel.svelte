@@ -1,7 +1,9 @@
 <script lang="ts">
   import { readerBus, jumpTo } from '../lib/readerBus.svelte'
+  import type { PdfDocData } from '../lib/stores.svelte'
+  import PdfPage from './PdfPage.svelte'
 
-  let { text }: { text: string } = $props()
+  let { text, pdf }: { text: string; pdf?: PdfDocData } = $props()
 
   interface Node {
     type: 'word' | 'text'
@@ -53,26 +55,32 @@
   })
 </script>
 
-<div class="source" bind:this={container}>
-  {#each nodes as node, i (i)}
-    {#if node.type === 'word'}
-      <span
-        class="word"
-        class:active={node.offset === readerBus.currentOffset}
-        data-offset={node.offset}
-        role="button"
-        tabindex="0"
-        onclick={() => node.offset !== undefined && jumpTo(node.offset)}
-        onkeydown={(e) => {
-          if ((e.key === 'Enter' || e.key === ' ') && node.offset !== undefined) {
-            e.preventDefault()
-            jumpTo(node.offset)
-          }
-        }}>{node.text}</span>
-    {:else}
-      <span class="text">{node.text}</span>
-    {/if}
-  {/each}
+<div class="source" class:pdf={!!pdf} bind:this={container}>
+  {#if pdf}
+    {#each pdf.pages as page, i (i)}
+      <PdfPage {page} />
+    {/each}
+  {:else}
+    {#each nodes as node, i (i)}
+      {#if node.type === 'word'}
+        <span
+          class="word"
+          class:active={node.offset === readerBus.currentOffset}
+          data-offset={node.offset}
+          role="button"
+          tabindex="0"
+          onclick={() => node.offset !== undefined && jumpTo(node.offset)}
+          onkeydown={(e) => {
+            if ((e.key === 'Enter' || e.key === ' ') && node.offset !== undefined) {
+              e.preventDefault()
+              jumpTo(node.offset)
+            }
+          }}>{node.text}</span>
+      {:else}
+        <span class="text">{node.text}</span>
+      {/if}
+    {/each}
+  {/if}
 </div>
 
 <style>
@@ -92,6 +100,11 @@
   }
   .text {
     white-space: pre-wrap;
+  }
+  .source.pdf {
+    padding: 0;
+    border: none;
+    line-height: normal;
   }
   .word {
     cursor: pointer;
