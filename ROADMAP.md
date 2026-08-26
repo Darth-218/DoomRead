@@ -58,19 +58,21 @@ The single source of truth for all reading logic, compiled to JVM (Android) and 
 
 **Exit criteria:** all MVP features (P0 + P1) work on Android with zero telemetry and no data leaving the device.
 
-## Phase 3 — Web MVP
+## Phase 3 — Web MVP (current)
+
+> **Built before Android** (decided during implementation) — the Web app is therefore the reference platform for MVP features; Android (Phase 2) will mirror it.
 
 | Item | Req | Status |
 |---|---|---|
-| Svelte + TypeScript + Vite app shell | §10 | Todo |
-| Consume the KMP core via its Kotlin/JS output (publish artifact, wire it in) | §10 | Todo |
+| Svelte + TypeScript + Vite app shell (Reader + Library/Stats/Settings views) | §10 | Done |
+| Consume the KMP core via its Kotlin/JS output (generated `core.mjs`, copied into the web app) | §10 | Done |
 | Speed Read + Immersive modes, same core pacing | FR-1, FR-2 | Todo |
 | Import: paste, file (PDF via pdf.js, EPUB via epub.js) | FR-3.1, FR-3.3, §10 | Todo |
 | IndexedDB storage + backup export/import; periodic export reminder | FR-7, FR-7.4 | Todo |
 | Same themes/typography controls/focus mode as Android | FR-4, FR-5 | Todo |
 | Static hosting (GitHub Pages or self-host) | OQ-9 | Todo |
 
-**Exit criteria:** feature parity with the Android MVP, both consuming the identical shared core.
+**Exit criteria:** all MVP features (P0 + P1) work in the browser, driven by the shared core.
 
 ## Phase 4 — Polish & hardening
 
@@ -104,6 +106,6 @@ The single source of truth for all reading logic, compiled to JVM (Android) and 
 
 ## Notes
 
-- Android is the reference platform for MVP features (Phase 2) because native storage and Readium parsing are more straightforward there; Web (Phase 3) then mirrors it.
+- Web is currently the reference platform for MVP features (Phase 3 first, Android Phase 2 second) because the Svelte/Vite app is lighter to iterate on and the core Kotlin/JS output is already being produced; Android then mirrors it.
 - Privacy and "fully open source" are constraints, not features — every dependency decision must pass both.
 - Governance open questions (OQ-7, OQ-8, OQ-10) should be resolved before the first external contribution, per [CONTRIBUTING.md](CONTRIBUTING.md).

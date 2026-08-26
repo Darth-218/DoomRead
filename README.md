@@ -4,7 +4,7 @@ Fully local, open source **RSVP** (Rapid Serial Visual Presentation) reader for 
 
 No servers. No accounts. No telemetry. Everything runs and stores on your device.
 
-> **Status: Phase 1 complete.** The shared KMP core engine (tokenizer, pacing, stats, backup codec) is implemented and tested across JVM, JS, and Android targets. See [reqs.md](reqs.md) for full requirements and [ROADMAP.md](ROADMAP.md) for what's next.
+> **Status: Phase 1 done, Phase 3 (Web) in progress.** The shared KMP core engine (tokenizer, pacing, stats, backup codec) is implemented and tested across JVM, JS, and Android targets. The Web app shell (Svelte + Vite) is up with a working speed reader driven by the compiled core; storage, import, stats, and theming come next. See [reqs.md](reqs.md) for full requirements and [ROADMAP.md](ROADMAP.md) for the current phase.
 
 ## What it is
 
@@ -39,7 +39,7 @@ Shared core, separate native UIs — a single Kotlin Multiplatform core keeps th
 |---|---|---|
 | Shared core | Kotlin Multiplatform, compiled to JVM (Android) and Kotlin/JS (Web) | ✅ Done (Phase 1) |
 | Android UI | Kotlin + Jetpack Compose | Todo (Phase 2) |
-| Web UI | TypeScript + Svelte (MIT — GPLv3-compatible) | Todo (Phase 3) |
+| Web UI | TypeScript + Svelte (MIT — GPLv3-compatible) | In progress (Phase 3) |
 | Android storage | Room / SQLite | Todo (Phase 2) |
 | Web storage | IndexedDB | Todo (Phase 3) |
 | PDF parsing | Readium pdfium adapter (Android) · pdf.js (Web) | Todo (Phase 2+) |
