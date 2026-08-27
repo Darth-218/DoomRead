@@ -150,6 +150,32 @@
   }
 </script>
 
+<div class="source" bind:this={container}>
+  {#each visible as node (node.offset)}
+    {#if node.type === 'word'}
+      <span
+        class="word"
+        class:active={node.offset === readerBus.currentOffset}
+        data-offset={node.offset}
+        role="button"
+        tabindex="0"
+        onclick={(e) => {
+          jumpTo(node.offset)
+          e.currentTarget.blur()
+        }}
+        onkeydown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            jumpTo(node.offset)
+            e.currentTarget.blur()
+          }
+        }}>{node.text}</span>
+    {:else}
+      <span class="text">{node.text}</span>
+    {/if}
+  {/each}
+</div>
+
 {#if isPdf && pages.length > 0}
   <div class="pager">
     <button
@@ -165,32 +191,6 @@
       onclick={(e) => goPage(1, e)}>→</button>
   </div>
 {/if}
-
-<div class="source" bind:this={container}>
-  {#each visible as node (node.offset)}
-      {#if node.type === 'word'}
-        <span
-          class="word"
-          class:active={node.offset === readerBus.currentOffset}
-          data-offset={node.offset}
-          role="button"
-          tabindex="0"
-          onclick={(e) => {
-            jumpTo(node.offset)
-            e.currentTarget.blur()
-          }}
-          onkeydown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              jumpTo(node.offset)
-              e.currentTarget.blur()
-            }
-          }}>{node.text}</span>
-      {:else}
-        <span class="text">{node.text}</span>
-      {/if}
-    {/each}
-</div>
 
 <style>
   .pager {
