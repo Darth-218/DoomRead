@@ -163,6 +163,23 @@
   .opt input[type='checkbox'] {
     accent-color: var(--fg);
   }
+  input[type='file'] {
+    color: var(--muted-2);
+    font: inherit;
+  }
+  input[type='file']::file-selector-button {
+    cursor: pointer;
+    border: 1px solid var(--fg);
+    background: var(--bg);
+    color: var(--fg);
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.4rem;
+    font: inherit;
+    margin-right: 0.75rem;
+  }
+  input[type='file']::file-selector-button:hover {
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
+  }
   .error {
     color: var(--danger);
     margin: 0;

@@ -101,21 +101,19 @@
     gap: 0.25rem;
   }
   nav button {
-    border: 1px solid var(--fg);
-    background: var(--bg);
-    padding: 0.4rem 0.75rem;
-    border-radius: 0.4rem;
+    border: none;
+    background: none;
+    padding: 0.4rem 0.6rem;
     cursor: pointer;
-    color: var(--fg);
+    color: var(--muted-2);
     font: inherit;
   }
   nav button:hover {
-    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
+    color: var(--fg);
   }
   nav button.active {
-    background: var(--fg);
-    color: var(--bg);
-    border-color: var(--fg);
+    color: var(--fg);
+    border-bottom: 2px solid var(--fg);
   }
   .theme-toggle {
     border: 1px solid var(--fg);
