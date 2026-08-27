@@ -222,6 +222,29 @@
     ;(e.currentTarget as HTMLElement).blur()
   }
 
+  // Scroll the wheel over the PDF page number to flip pages (up = previous,
+  // down = next). Throttled so a single trackpad gesture doesn't skip many.
+  let lastWheel = 0
+  function onPageWheel(e: WheelEvent) {
+    if (!isPdf || pages.length === 0) return
+    e.preventDefault()
+    const now = Date.now()
+    if (now - lastWheel < 120) return
+    lastWheel = now
+    goPage(e.deltaY < 0 ? -1 : 1, e)
+  }
+
+  // Click the word-count line (epub/txt) to recenter the source on the current
+  // reading word, expanding the sliding window if it scrolled out of view.
+  function jumpToCurrentWord() {
+    if (isPdf) return
+    expandTo(activeIdx)
+    void tick().then(() => {
+      const el = container?.querySelector('.word.active') as HTMLElement | null
+      if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    })
+  }
+
   // Click / tap the page indicator to type a page number and jump straight to
   // it. Entries are clamped to the valid range and escape/blur cancels.
   let editingPage = $state(false)
@@ -301,13 +324,14 @@
           onblur={commitPage}
           size="3"
         />
-      {:else}
+       {:else}
         <span
           class="pageinfo"
           role="button"
           tabindex="0"
-          title="Click to jump to a page"
+          title="Click to jump to a page · scroll to change page"
           onclick={startEditPage}
+          onwheel={onPageWheel}
           onkeydown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault()
@@ -329,7 +353,15 @@
       <button type="button" class="phantom" aria-hidden="true" tabindex="-1">→</button>
     {/if}
   </div>
-  <p class="wordcount">word {currentWord} of {totalWords}</p>
+  {#if isPdf}
+    <p class="wordcount">word {currentWord} of {totalWords}</p>
+  {:else}
+    <button
+      type="button"
+      class="wordcount clickable"
+      title="Jump to the current word"
+      onclick={jumpToCurrentWord}>word {currentWord} of {totalWords}</button>
+  {/if}
 </div>
 
 <style>
@@ -387,6 +419,17 @@
     font-size: 0.9rem;
     color: var(--muted);
     text-align: center;
+    border: none;
+    background: none;
+    padding: 0;
+    font: inherit;
+    width: 100%;
+  }
+  .wordcount.clickable {
+    cursor: pointer;
+  }
+  .wordcount.clickable:hover {
+    color: var(--fg);
   }
   .panel {
     display: flex;
