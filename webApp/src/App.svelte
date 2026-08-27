@@ -44,12 +44,23 @@
         </button>
       {/each}
     </nav>
-    <button
-      class="theme-toggle"
-      type="button"
-      aria-label="Cycle display mode"
-      title="Cycle display mode"
-      onclick={() => settingsStore.cycleDisplay()}>{settingsStore.displayMode === 'dark' ? '☀' : settingsStore.displayMode === 'sepia' ? 'Ⓢ' : '☾'}</button>
+    <div class="modes">
+      <button
+        class:active={settingsStore.displayMode === 'light'}
+        aria-label="Light mode"
+        title="Light"
+        onclick={() => settingsStore.setDisplayMode('light')}>L</button>
+      <button
+        class:active={settingsStore.displayMode === 'dark'}
+        aria-label="Dark mode"
+        title="Dark"
+        onclick={() => settingsStore.setDisplayMode('dark')}>D</button>
+      <button
+        class:active={settingsStore.displayMode === 'sepia'}
+        aria-label="Sepia mode"
+        title="Sepia"
+        onclick={() => settingsStore.setDisplayMode('sepia')}>S</button>
+    </div>
   </div>
 </header>
 
@@ -115,20 +126,24 @@
     color: var(--fg);
     border-bottom: 2px solid var(--fg);
   }
-  .theme-toggle {
-    border: 1px solid var(--fg);
-    background: var(--bg);
-    color: var(--fg);
-    border-radius: 0.4rem;
-    width: 2.2rem;
-    height: 2.2rem;
-    font: inherit;
-    font-size: 1.1rem;
-    line-height: 1;
-    cursor: pointer;
+  .modes {
+    display: flex;
+    gap: 0.25rem;
   }
-  .theme-toggle:hover {
-    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
+  .modes button {
+    border: none;
+    background: none;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    color: var(--muted-2);
+    font: inherit;
+  }
+  .modes button:hover {
+    color: var(--fg);
+  }
+  .modes button.active {
+    color: var(--fg);
+    border-bottom: 2px solid var(--fg);
   }
   .view {
     flex: 1 1 auto;
