@@ -23,7 +23,10 @@
       <button
         class="chip"
         class:active={i === active}
-        onclick={() => jumpTo(ch.offset)}
+        onclick={(e) => {
+          jumpTo(ch.offset)
+          e.currentTarget.blur()
+        }}
         title={ch.title}
       >{ch.title}</button>
     {/each}

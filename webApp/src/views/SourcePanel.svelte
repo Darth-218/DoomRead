@@ -87,11 +87,15 @@
           data-offset={node.offset}
           role="button"
           tabindex="0"
-          onclick={() => jumpTo(node.offset)}
+          onclick={(e) => {
+            jumpTo(node.offset)
+            e.currentTarget.blur()
+          }}
           onkeydown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault()
               jumpTo(node.offset)
+              e.currentTarget.blur()
             }
           }}>{node.text}</span>
       {:else}
