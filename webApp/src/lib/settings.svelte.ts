@@ -1,13 +1,13 @@
 import '@fontsource-variable/lexend'
 
 type DisplayMode = 'light' | 'dark' | 'sepia'
-type FontFamily = 'sans' | 'mono' | 'dyslexic'
+type FontFamily = 'sans' | 'mono' | 'dyslexic' | 'custom'
 type ReaderEffect = 'none' | 'focus-bold' | 'orp-reticle'
 type Preset = 'default' | 'monospace' | 'dyslexia' | 'focus-bold' | 'orp-reticle'
 
 const STORAGE_KEY = 'doomread-settings'
 
-const FONT_STACKS: Record<FontFamily, string> = {
+const FONT_STACKS: Record<Exclude<FontFamily, 'custom'>, string> = {
   sans: 'system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
   mono: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", "Courier New", monospace',
   dyslexic: '"Lexend Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
@@ -32,18 +32,24 @@ const PRESETS: Record<Preset, {
 const DEFAULTS = {
   displayMode: 'light' as DisplayMode,
   fontFamily: 'mono' as FontFamily,
+  customFont: '',
   fontSize: 3,
   lineSpacing: 1.9,
   preset: 'default' as Preset,
   readerEffect: 'none' as ReaderEffect,
+  bgColor: '',
+  fgColor: '',
 }
 
 let displayMode = $state<DisplayMode>(DEFAULTS.displayMode)
 let fontFamily = $state<FontFamily>(DEFAULTS.fontFamily)
+let customFont = $state<string>(DEFAULTS.customFont)
 let fontSize = $state<number>(DEFAULTS.fontSize)
 let lineSpacing = $state<number>(DEFAULTS.lineSpacing)
 let preset = $state<Preset>(DEFAULTS.preset)
 let readerEffect = $state<ReaderEffect>(DEFAULTS.readerEffect)
+let bgColor = $state<string>(DEFAULTS.bgColor)
+let fgColor = $state<string>(DEFAULTS.fgColor)
 
 function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n))
@@ -53,16 +59,25 @@ function apply() {
   if (typeof document === 'undefined') return
   const root = document.documentElement
   root.dataset.theme = displayMode
-  root.style.setProperty('--reader-font-family', FONT_STACKS[fontFamily])
+  root.style.setProperty(
+    '--reader-font-family',
+    fontFamily === 'custom' && customFont.trim()
+      ? customFont
+      : FONT_STACKS[fontFamily as Exclude<FontFamily, 'custom'>],
+  )
   root.style.setProperty('--reader-font-size', `${fontSize}rem`)
   root.style.setProperty('--reader-line-height', String(lineSpacing))
+  if (bgColor) root.style.setProperty('--bg', bgColor)
+  else root.style.removeProperty('--bg')
+  if (fgColor) root.style.setProperty('--fg', fgColor)
+  else root.style.removeProperty('--fg')
 }
 
 function persist() {
   if (typeof localStorage === 'undefined') return
   localStorage.setItem(
     STORAGE_KEY,
-    JSON.stringify({ displayMode, fontFamily, fontSize, lineSpacing, preset, readerEffect }),
+    JSON.stringify({ displayMode, fontFamily, customFont, fontSize, lineSpacing, preset, readerEffect, bgColor, fgColor }),
   )
 }
 
@@ -72,6 +87,9 @@ export const settingsStore = {
   },
   get fontFamily() {
     return fontFamily
+  },
+  get customFont() {
+    return customFont
   },
   get fontSize() {
     return fontSize
@@ -85,6 +103,12 @@ export const settingsStore = {
   get readerEffect() {
     return readerEffect
   },
+  get bgColor() {
+    return bgColor
+  },
+  get fgColor() {
+    return fgColor
+  },
   setDisplayMode(m: DisplayMode) {
     displayMode = m
     preset = 'default'
@@ -93,6 +117,13 @@ export const settingsStore = {
   },
   setFontFamily(f: FontFamily) {
     fontFamily = f
+    preset = 'default'
+    apply()
+    persist()
+  },
+  setCustomFont(name: string) {
+    customFont = name
+    fontFamily = 'custom'
     preset = 'default'
     apply()
     persist()
@@ -120,6 +151,20 @@ export const settingsStore = {
     apply()
     persist()
   },
+  setBgColor(c: string) {
+    bgColor = c
+    persist()
+  },
+  setFgColor(c: string) {
+    fgColor = c
+    persist()
+  },
+  clearColors() {
+    bgColor = ''
+    fgColor = ''
+    apply()
+    persist()
+  },
   cycleDisplay() {
     const i = DISPLAY_ORDER.indexOf(displayMode)
     displayMode = DISPLAY_ORDER[(i + 1) % DISPLAY_ORDER.length]
@@ -134,8 +179,9 @@ export const settingsStore = {
           const p = JSON.parse(saved)
           if (p.displayMode === 'light' || p.displayMode === 'dark' || p.displayMode === 'sepia')
             displayMode = p.displayMode
-          if (p.fontFamily === 'sans' || p.fontFamily === 'mono' || p.fontFamily === 'dyslexic')
+          if (p.fontFamily === 'sans' || p.fontFamily === 'mono' || p.fontFamily === 'dyslexic' || p.fontFamily === 'custom')
             fontFamily = p.fontFamily
+          if (typeof p.customFont === 'string') customFont = p.customFont
           if (typeof p.fontSize === 'number') fontSize = clamp(p.fontSize, 1, 8)
           if (typeof p.lineSpacing === 'number') lineSpacing = clamp(p.lineSpacing, 1.2, 3)
           if (
@@ -148,6 +194,8 @@ export const settingsStore = {
             preset = p.preset
           if (p.readerEffect === 'none' || p.readerEffect === 'focus-bold' || p.readerEffect === 'orp-reticle')
             readerEffect = p.readerEffect
+          if (typeof p.bgColor === 'string') bgColor = p.bgColor
+          if (typeof p.fgColor === 'string') fgColor = p.fgColor
         } catch {
           /* ignore corrupt storage */
         }

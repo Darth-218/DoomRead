@@ -12,6 +12,7 @@
     { id: 'sans', label: 'Sans-serif' },
     { id: 'mono', label: 'Monospace' },
     { id: 'dyslexic', label: 'Dyslexia' },
+    { id: 'custom', label: 'Custom' },
   ] as const
 
   const presets = [
@@ -46,6 +47,15 @@
           onclick={() => settingsStore.setFontFamily(f.id)}>{f.label}</button>
       {/each}
     </div>
+    {#if settingsStore.fontFamily === 'custom'}
+      <input
+        class="custom-font"
+        type="text"
+        placeholder="e.g. Georgia, serif"
+        value={settingsStore.customFont}
+        oninput={(e) => settingsStore.setCustomFont(e.currentTarget.value)}
+      />
+    {/if}
   </section>
 
   <section>
@@ -103,11 +113,31 @@
   </section>
 
   <section>
+    <h3>Colors</h3>
+    <div class="colors">
+      <label>
+        Background
+        <input
+          type="color"
+          value={settingsStore.bgColor || '#ffffff'}
+          oninput={(e) => settingsStore.setBgColor(e.currentTarget.value)}
+        />
+      </label>
+      <label>
+        Text
+        <input
+          type="color"
+          value={settingsStore.fgColor || '#111111'}
+          oninput={(e) => settingsStore.setFgColor(e.currentTarget.value)}
+        />
+      </label>
+      <button type="button" onclick={() => settingsStore.clearColors()}>Reset</button>
+    </div>
+  </section>
+
+  <section>
     <h3>Preview</h3>
-    <p class="preview">
-      The quick brown fox jumps over the lazy dog. Reading should feel calm and
-      effortless at any speed.
-    </p>
+    <p class="preview">Preview</p>
   </section>
 </div>
 
@@ -154,6 +184,49 @@
     color: var(--nav-active-fg);
     border-color: var(--nav-active-bg);
   }
+  .custom-font {
+    margin-top: 0.6rem;
+    width: 100%;
+    font: inherit;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    background: var(--surface);
+    color: var(--fg);
+  }
+  .colors {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+  }
+  .colors label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+  }
+  .colors input[type='color'] {
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    background: none;
+    cursor: pointer;
+  }
+  .colors button {
+    font: inherit;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    background: var(--surface);
+    color: var(--fg);
+    cursor: pointer;
+  }
+  .colors button:hover {
+    background: var(--hover-2);
+  }
   input[type='range'] {
     width: 100%;
     accent-color: var(--word-active-fg);
@@ -165,6 +238,7 @@
     min-height: 9rem;
     display: flex;
     align-items: center;
+    justify-content: center;
     overflow: hidden;
     font-family: var(--reader-font-family);
     font-size: var(--reader-font-size);
@@ -172,6 +246,7 @@
     padding: 0 1.25rem;
     border: 1px solid var(--border);
     border-radius: 0.5rem;
-    background: var(--surface);
+    background: var(--bg);
+    color: var(--fg);
   }
 </style>
