@@ -40,6 +40,7 @@ const DEFAULTS = {
   bgColor: '',
   fgColor: '',
   defaultDocId: '',
+  libraryOrder: [] as string[],
 }
 
 let displayMode = $state<DisplayMode>(DEFAULTS.displayMode)
@@ -52,6 +53,7 @@ let readerEffect = $state<ReaderEffect>(DEFAULTS.readerEffect)
 let bgColor = $state<string>(DEFAULTS.bgColor)
 let fgColor = $state<string>(DEFAULTS.fgColor)
 let defaultDocId = $state<string>(DEFAULTS.defaultDocId)
+let libraryOrder = $state<string[]>(DEFAULTS.libraryOrder)
 
 function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n))
@@ -79,7 +81,7 @@ function persist() {
   if (typeof localStorage === 'undefined') return
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ displayMode, fontFamily, customFont, fontSize, lineSpacing, preset, readerEffect, bgColor, fgColor, defaultDocId }),
+       JSON.stringify({ displayMode, fontFamily, customFont, fontSize, lineSpacing, preset, readerEffect, bgColor, fgColor, defaultDocId, libraryOrder }),
     )
 }
 
@@ -113,6 +115,9 @@ export const settingsStore = {
   },
   get defaultDocId() {
     return defaultDocId
+  },
+  get libraryOrder() {
+    return libraryOrder
   },
   setDisplayMode(m: DisplayMode) {
     displayMode = m
@@ -178,6 +183,10 @@ export const settingsStore = {
     defaultDocId = ''
     persist()
   },
+  setLibraryOrder(ids: string[]) {
+    libraryOrder = ids
+    persist()
+  },
   resetAll() {
     displayMode = DEFAULTS.displayMode
     fontFamily = DEFAULTS.fontFamily
@@ -224,6 +233,7 @@ export const settingsStore = {
           if (typeof p.bgColor === 'string') bgColor = p.bgColor
           if (typeof p.fgColor === 'string') fgColor = p.fgColor
           if (typeof p.defaultDocId === 'string') defaultDocId = p.defaultDocId
+      if (Array.isArray(p.libraryOrder)) libraryOrder = p.libraryOrder.filter((x: unknown) => typeof x === 'string')
         } catch {
           /* ignore corrupt storage */
         }

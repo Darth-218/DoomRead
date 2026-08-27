@@ -15,6 +15,19 @@
   let showImport = $state(false)
   let layout = $state<'list' | 'grid'>('list')
   let openMenu = $state<string | null>(null)
+  let dragId = $state<string | null>(null)
+  let dragOverId = $state<string | null>(null)
+
+  // Display order follows the persisted libraryOrder; documents not yet in it
+  // (newly added) sort to the end.
+  const ordered = $derived.by(() => {
+    const order = settingsStore.libraryOrder
+    const rank = (id: string) => {
+      const i = order.indexOf(id)
+      return i === -1 ? Number.MAX_SAFE_INTEGER : i
+    }
+    return [...documents].sort((a, b) => rank(a.id) - rank(b.id))
+  })
 
   function toggleMenu(id: string) {
     openMenu = openMenu === id ? null : id
@@ -22,6 +35,17 @@
   function choose(fn: () => void) {
     fn()
     openMenu = null
+  }
+
+  function reorderTo(targetId: string) {
+    if (!dragId || dragId === targetId) return
+    const ids = ordered.map((d) => d.id).filter((id) => id !== dragId)
+    const idx = ids.indexOf(targetId)
+    if (idx === -1) ids.push(dragId)
+    else ids.splice(idx, 0, dragId)
+    settingsStore.setLibraryOrder(ids)
+    dragId = null
+    dragOverId = null
   }
 
   async function onFile(e: Event) {
@@ -115,10 +139,34 @@
     <p class="empty">No documents yet.</p>
   {:else}
     <ul class:grid={layout === 'grid'}>
-      {#each documents as doc (doc.id)}
+      {#each ordered as doc (doc.id)}
         <li
           class="card"
-          title="Double-click to open"
+          class:dragging={dragId === doc.id}
+          class:drag-over={dragOverId === doc.id}
+          draggable="true"
+          title="Double-click to open · drag to reorder"
+          ondragstart={(e) => {
+            dragId = doc.id
+            e.dataTransfer?.setData('text/plain', doc.id)
+            if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move'
+          }}
+          ondragover={(e) => {
+            e.preventDefault()
+            if (e.dataTransfer) e.dataTransfer.dropEffect = 'move'
+            dragOverId = doc.id
+          }}
+          ondragleave={() => {
+            if (dragOverId === doc.id) dragOverId = null
+          }}
+          ondrop={(e) => {
+            e.preventDefault()
+            reorderTo(doc.id)
+          }}
+          ondragend={() => {
+            dragId = null
+            dragOverId = null
+          }}
           ondblclick={(e) => {
             if ((e.target as HTMLElement).closest('.menu-wrap')) return
             onOpen(doc.id)
@@ -281,8 +329,19 @@
     padding: 0.75rem 1rem;
     border: 1px solid var(--border);
     border-radius: 0.5rem;
-    cursor: pointer;
+    cursor: grab;
     user-select: none;
+  }
+  li:active {
+    cursor: grabbing;
+  }
+  li.dragging {
+    opacity: 0.45;
+    cursor: grabbing;
+  }
+  li.drag-over {
+    border-color: var(--fg);
+    box-shadow: 0 0 0 1px var(--fg) inset;
   }
   ul.grid li {
     position: relative;
