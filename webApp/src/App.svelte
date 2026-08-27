@@ -115,11 +115,16 @@
     display: flex;
     gap: 1.5rem;
     align-items: flex-start;
+    justify-content: center;
     width: 100%;
     max-width: 1100px;
   }
   .pane {
     flex: 1 1 0;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 </style>

@@ -262,6 +262,8 @@
     margin: 0;
     cursor: pointer;
     user-select: none;
+    width: 100%;
+    text-align: center;
   }
   .controls {
     display: flex;
