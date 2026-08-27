@@ -239,6 +239,7 @@
       />
       <button type="button" aria-label="Increase speed" onclick={() => setWpm(wpm + 50)}>+50</button>
     </div>
+    <span class="wpm-ghost" aria-hidden="true">WPM {wpm}</span>
   </div>
   <button
     class="playpause"
@@ -280,6 +281,11 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+  }
+  .wpm-ghost {
+    color: #e0e0e0;
+    min-width: 4.5rem;
+    text-align: right;
   }
   .wpm-control {
     display: flex;
