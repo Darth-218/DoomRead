@@ -342,13 +342,16 @@
     margin: 0.5rem 0;
   }
   .pager button {
-    border: 1px solid var(--border);
-    background: var(--surface);
+    border: 1px solid var(--fg);
+    background: var(--bg);
     color: var(--fg);
     border-radius: 0.4rem;
     padding: 0.2rem 0.7rem;
     cursor: pointer;
     font: inherit;
+  }
+  .pager button:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
   }
   .pager button:disabled {
     opacity: 0.4;

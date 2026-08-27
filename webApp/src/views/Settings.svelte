@@ -157,19 +157,19 @@
   .choices button {
     font: inherit;
     padding: 0.45rem 0.9rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--fg);
     border-radius: 0.4rem;
-    background: var(--surface);
+    background: var(--bg);
     color: var(--fg);
     cursor: pointer;
   }
   .choices button:hover {
-    background: var(--hover-2);
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
   }
   .choices button.active {
-    background: var(--nav-active-bg);
-    color: var(--nav-active-fg);
-    border-color: var(--nav-active-bg);
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
   }
   .custom-font {
     margin-top: 0.6rem;
@@ -205,14 +205,14 @@
   .colors button {
     font: inherit;
     padding: 0.4rem 0.8rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--fg);
     border-radius: 0.4rem;
-    background: var(--surface);
+    background: var(--bg);
     color: var(--fg);
     cursor: pointer;
   }
   .colors button:hover {
-    background: var(--hover-2);
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
   }
   .reset {
     border-top: 1px solid var(--border);
@@ -221,18 +221,18 @@
   .reset-btn {
     font: inherit;
     padding: 0.5rem 1rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--fg);
     border-radius: 0.4rem;
-    background: var(--surface);
+    background: var(--bg);
     color: var(--fg);
     cursor: pointer;
   }
   .reset-btn:hover {
-    background: var(--hover-2);
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
   }
   input[type='range'] {
     width: 100%;
-    accent-color: var(--word-active-fg);
+    accent-color: var(--fg);
     cursor: pointer;
   }
   .preview {

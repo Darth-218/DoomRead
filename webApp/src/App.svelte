@@ -101,23 +101,25 @@
     gap: 0.25rem;
   }
   nav button {
-    border: none;
-    background: none;
+    border: 1px solid var(--fg);
+    background: var(--bg);
     padding: 0.4rem 0.75rem;
     border-radius: 0.4rem;
     cursor: pointer;
-    color: var(--muted-2);
+    color: var(--fg);
+    font: inherit;
   }
   nav button:hover {
-    background: var(--hover-2);
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
   }
   nav button.active {
-    background: var(--nav-active-bg);
-    color: var(--nav-active-fg);
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
   }
   .theme-toggle {
-    border: 1px solid var(--border);
-    background: var(--surface);
+    border: 1px solid var(--fg);
+    background: var(--bg);
     color: var(--fg);
     border-radius: 0.4rem;
     width: 2.2rem;
@@ -128,7 +130,7 @@
     cursor: pointer;
   }
   .theme-toggle:hover {
-    background: var(--hover-2);
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
   }
   .view {
     flex: 1 1 auto;

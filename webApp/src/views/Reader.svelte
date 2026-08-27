@@ -353,6 +353,13 @@
     font: inherit;
     padding: 0.2rem 0.6rem;
     cursor: pointer;
+    border: 1px solid var(--fg);
+    border-radius: 0.3rem;
+    background: var(--bg);
+    color: var(--fg);
+  }
+  .wpm-control button:hover {
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
   }
   .playpause {
     font: inherit;
@@ -363,14 +370,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--border);
+    border: 1px solid var(--fg);
     border-radius: 0.4rem;
-    background: var(--surface);
+    background: var(--bg);
     color: var(--fg);
     cursor: pointer;
   }
   .playpause:hover {
-    background: var(--hover-2);
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
   }
   .help {
     position: relative;
@@ -385,10 +392,13 @@
     font-size: 0.9rem;
     line-height: 1;
     border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--surface);
+    border: 1px solid var(--fg);
+    background: var(--bg);
     color: var(--fg);
     cursor: help;
+  }
+  .help:hover {
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
   }
   .tooltip {
     position: absolute;
