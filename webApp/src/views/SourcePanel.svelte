@@ -159,7 +159,7 @@
 </script>
 
 <div class="panel">
-  <div class="source" class:windowed={!isPdf} bind:this={container}>
+  <div class="source" bind:this={container}>
     {#each visible as node (node.offset)}
       {#if node.type === 'word'}
         <span
@@ -258,14 +258,6 @@
     white-space: pre-wrap;
     word-break: break-word;
     user-select: none;
-  }
-  /* Ease text in/out at the top and bottom of the windowed view so words don't
-     hard-clip as the reading window scrolls. The centered active word (kept in
-     the middle via scrollIntoView) stays fully opaque. PDF pages are shown
-     whole, so the mask is only applied to the windowed (non-PDF) view. */
-  .source.windowed {
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 91%, transparent 100%);
-            mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 91%, transparent 100%);
   }
   .text {
     white-space: pre-wrap;
