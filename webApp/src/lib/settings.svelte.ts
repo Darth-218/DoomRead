@@ -165,6 +165,19 @@ export const settingsStore = {
     apply()
     persist()
   },
+  resetAll() {
+    displayMode = DEFAULTS.displayMode
+    fontFamily = DEFAULTS.fontFamily
+    customFont = DEFAULTS.customFont
+    fontSize = DEFAULTS.fontSize
+    lineSpacing = DEFAULTS.lineSpacing
+    preset = DEFAULTS.preset
+    readerEffect = DEFAULTS.readerEffect
+    bgColor = DEFAULTS.bgColor
+    fgColor = DEFAULTS.fgColor
+    apply()
+    persist()
+  },
   cycleDisplay() {
     const i = DISPLAY_ORDER.indexOf(displayMode)
     displayMode = DISPLAY_ORDER[(i + 1) % DISPLAY_ORDER.length]

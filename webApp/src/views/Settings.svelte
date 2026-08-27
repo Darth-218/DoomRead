@@ -139,6 +139,12 @@
     <h3>Preview</h3>
     <p class="preview">Preview</p>
   </section>
+
+  <section class="reset">
+    <button type="button" class="reset-btn" onclick={() => settingsStore.resetAll()}>
+      Restore all settings
+    </button>
+  </section>
 </div>
 
 <style>
@@ -225,6 +231,22 @@
     cursor: pointer;
   }
   .colors button:hover {
+    background: var(--hover-2);
+  }
+  .reset {
+    border-top: 1px solid var(--border);
+    padding-top: 1.25rem;
+  }
+  .reset-btn {
+    font: inherit;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    background: var(--surface);
+    color: var(--fg);
+    cursor: pointer;
+  }
+  .reset-btn:hover {
     background: var(--hover-2);
   }
   input[type='range'] {
