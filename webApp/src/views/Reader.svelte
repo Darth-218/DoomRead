@@ -225,20 +225,26 @@
 <button type="button" class="word" aria-label="Play or pause" onclick={toggle}>{word}</button>
 <div class="controls">
   <label for="wpm">WPM {wpm}</label>
-  <div class="wpm-control">
-    <button type="button" aria-label="Decrease speed" onclick={() => setWpm(wpm - 50)}>−50</button>
-    <input
-      id="wpm"
-      type="number"
-      min="100"
-      max="1000"
-      step="50"
-      value={wpm}
-      oninput={(e) => setWpm(+(e.currentTarget.value))}
-    />
-    <button type="button" aria-label="Increase speed" onclick={() => setWpm(wpm + 50)}>+50</button>
+  <div class="wpm-group">
+    <div class="wpm-control">
+      <button type="button" aria-label="Decrease speed" onclick={() => setWpm(wpm - 50)}>−50</button>
+      <input
+        id="wpm"
+        type="number"
+        min="100"
+        max="1000"
+        step="50"
+        value={wpm}
+        oninput={(e) => setWpm(+(e.currentTarget.value))}
+      />
+      <button type="button" aria-label="Increase speed" onclick={() => setWpm(wpm + 50)}>+50</button>
+    </div>
+    <button
+      class="playpause"
+      aria-label={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
+      title={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
+      onclick={toggle}>{running ? '⏸' : finished ? '↻' : '▶'}</button>
   </div>
-  <button onclick={toggle}>{running ? 'Pause' : finished ? 'Re-read' : 'Read'}</button>
 </div>
 <p class="meta">
   {#if finished}
@@ -270,6 +276,12 @@
     align-items: center;
     gap: 0.75rem;
   }
+  .wpm-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
   .wpm-control {
     display: flex;
     align-items: center;
@@ -291,6 +303,23 @@
     font: inherit;
     padding: 0.2rem 0.6rem;
     cursor: pointer;
+  }
+  .playpause {
+    font: inherit;
+    font-size: 1.1rem;
+    line-height: 1;
+    width: 2.4rem;
+    height: 2.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 0.4rem;
+    background: #fff;
+    cursor: pointer;
+  }
+  .playpause:hover {
+    background: #f0f0f0;
   }
   .meta {
     color: #666;
