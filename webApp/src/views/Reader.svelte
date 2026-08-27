@@ -241,18 +241,19 @@
     </div>
     <span class="wpm-ghost" aria-hidden="true">WPM {wpm}</span>
   </div>
-  <button
-    class="playpause"
-    aria-label={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
-    title={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
-    onclick={toggle}>{running ? '⏸' : finished ? '↻' : '▶'}</button>
+  <div class="play-row">
+    <span class="play-spacer" aria-hidden="true"></span>
+    <button
+      class="playpause"
+      aria-label={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
+      title={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
+      onclick={toggle}>{running ? '⏸' : finished ? '↻' : '▶'}</button>
+    <button class="help" type="button" aria-label="Reading controls help">
+      ?
+      <span class="tooltip">space: tap to step · hold to read · release to pause · ←/→ step · click word to play/pause</span>
+    </button>
+  </div>
 </div>
-<p class="meta">
-  <button class="help" type="button" aria-label="Reading controls help">
-    ?
-    <span class="tooltip">space: tap to step · hold to read · release to pause · ←/→ step · click word to play/pause</span>
-  </button>
-</p>
 
 <style>
   .word {
@@ -284,6 +285,15 @@
     color: transparent;
     min-width: 4.5rem;
     text-align: right;
+  }
+  .play-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .play-spacer {
+    width: 1.4rem;
   }
   .wpm-control {
     display: flex;
@@ -328,11 +338,6 @@
   }
   .playpause:hover {
     background: var(--hover-2);
-  }
-  .meta {
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin: 0;
   }
   .help {
     position: relative;

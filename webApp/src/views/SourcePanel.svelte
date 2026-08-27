@@ -380,7 +380,7 @@
     padding: 0.15rem 0.4rem;
   }
   .wordcount {
-    margin: 0;
+    margin: 0.75rem 0 0;
     font-size: 0.9rem;
     color: var(--muted);
     text-align: center;
