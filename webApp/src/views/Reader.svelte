@@ -224,8 +224,8 @@
 
 <button type="button" class="word" aria-label="Play or pause" onclick={toggle}>{word}</button>
 <div class="controls">
-  <label for="wpm">WPM {wpm}</label>
-  <div class="wpm-group">
+  <div class="wpm-row">
+    <label for="wpm">WPM {wpm}</label>
     <div class="wpm-control">
       <button type="button" aria-label="Decrease speed" onclick={() => setWpm(wpm - 50)}>−50</button>
       <input
@@ -239,12 +239,12 @@
       />
       <button type="button" aria-label="Increase speed" onclick={() => setWpm(wpm + 50)}>+50</button>
     </div>
-    <button
-      class="playpause"
-      aria-label={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
-      title={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
-      onclick={toggle}>{running ? '⏸' : finished ? '↻' : '▶'}</button>
   </div>
+  <button
+    class="playpause"
+    aria-label={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
+    title={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
+    onclick={toggle}>{running ? '⏸' : finished ? '↻' : '▶'}</button>
 </div>
 <p class="meta">
   {#if finished}
@@ -273,14 +273,14 @@
   }
   .controls {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .wpm-group {
-    display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.6rem;
+  }
+  .wpm-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
   .wpm-control {
     display: flex;
