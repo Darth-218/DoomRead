@@ -12,6 +12,14 @@
     { id: 'mono', label: 'Monospace' },
     { id: 'dyslexic', label: 'Dyslexia' },
   ] as const
+
+  const presets = [
+    { id: 'default', label: 'Default' },
+    { id: 'monospace', label: 'Monospace' },
+    { id: 'dyslexia', label: 'Dyslexia' },
+    { id: 'focus-bold', label: 'Focus Bold' },
+    { id: 'orp-reticle', label: 'ORP Reticle' },
+  ] as const
 </script>
 
 <div class="settings">
@@ -35,6 +43,17 @@
         <button
           class:active={settingsStore.fontFamily === f.id}
           onclick={() => settingsStore.setFontFamily(f.id)}>{f.label}</button>
+      {/each}
+    </div>
+  </section>
+
+  <section>
+    <h3>Theme presets</h3>
+    <div class="choices">
+      {#each presets as p}
+        <button
+          class:active={settingsStore.preset === p.id}
+          onclick={() => settingsStore.applyPreset(p.id)}>{p.label}</button>
       {/each}
     </div>
   </section>

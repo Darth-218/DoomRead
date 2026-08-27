@@ -1,5 +1,8 @@
+import '@fontsource-variable/lexend'
+
 type DisplayMode = 'light' | 'dark' | 'sepia'
 type FontFamily = 'sans' | 'mono' | 'dyslexic'
+type ReaderEffect = 'none' | 'focus-bold' | 'orp-reticle'
 type Preset = 'default' | 'monospace' | 'dyslexia' | 'focus-bold' | 'orp-reticle'
 
 const STORAGE_KEY = 'doomread-settings'
@@ -7,10 +10,24 @@ const STORAGE_KEY = 'doomread-settings'
 const FONT_STACKS: Record<FontFamily, string> = {
   sans: 'system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
   mono: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", "Courier New", monospace',
-  dyslexic: '"Lexend", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  dyslexic: '"Lexend Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
 }
 
 const DISPLAY_ORDER: DisplayMode[] = ['light', 'dark', 'sepia']
+
+const PRESETS: Record<Preset, {
+  displayMode: DisplayMode
+  fontFamily: FontFamily
+  fontSize: number
+  lineSpacing: number
+  readerEffect: ReaderEffect
+}> = {
+  default: { displayMode: 'light', fontFamily: 'sans', fontSize: 3, lineSpacing: 1.9, readerEffect: 'none' },
+  monospace: { displayMode: 'light', fontFamily: 'mono', fontSize: 3, lineSpacing: 1.9, readerEffect: 'none' },
+  dyslexia: { displayMode: 'light', fontFamily: 'dyslexic', fontSize: 3, lineSpacing: 1.9, readerEffect: 'none' },
+  'focus-bold': { displayMode: 'light', fontFamily: 'sans', fontSize: 3, lineSpacing: 1.9, readerEffect: 'focus-bold' },
+  'orp-reticle': { displayMode: 'light', fontFamily: 'sans', fontSize: 3, lineSpacing: 1.9, readerEffect: 'orp-reticle' },
+}
 
 const DEFAULTS = {
   displayMode: 'light' as DisplayMode,
@@ -18,6 +35,7 @@ const DEFAULTS = {
   fontSize: 3,
   lineSpacing: 1.9,
   preset: 'default' as Preset,
+  readerEffect: 'none' as ReaderEffect,
 }
 
 let displayMode = $state<DisplayMode>(DEFAULTS.displayMode)
@@ -25,6 +43,7 @@ let fontFamily = $state<FontFamily>(DEFAULTS.fontFamily)
 let fontSize = $state<number>(DEFAULTS.fontSize)
 let lineSpacing = $state<number>(DEFAULTS.lineSpacing)
 let preset = $state<Preset>(DEFAULTS.preset)
+let readerEffect = $state<ReaderEffect>(DEFAULTS.readerEffect)
 
 function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n))
@@ -43,7 +62,7 @@ function persist() {
   if (typeof localStorage === 'undefined') return
   localStorage.setItem(
     STORAGE_KEY,
-    JSON.stringify({ displayMode, fontFamily, fontSize, lineSpacing, preset }),
+    JSON.stringify({ displayMode, fontFamily, fontSize, lineSpacing, preset, readerEffect }),
   )
 }
 
@@ -62,6 +81,9 @@ export const settingsStore = {
   },
   get preset() {
     return preset
+  },
+  get readerEffect() {
+    return readerEffect
   },
   setDisplayMode(m: DisplayMode) {
     displayMode = m
@@ -84,6 +106,17 @@ export const settingsStore = {
   setLineSpacing(n: number) {
     lineSpacing = clamp(n, 1.2, 3)
     preset = 'default'
+    apply()
+    persist()
+  },
+  applyPreset(p: Preset) {
+    const c = PRESETS[p]
+    displayMode = c.displayMode
+    fontFamily = c.fontFamily
+    fontSize = c.fontSize
+    lineSpacing = c.lineSpacing
+    readerEffect = c.readerEffect
+    preset = p
     apply()
     persist()
   },
@@ -113,6 +146,8 @@ export const settingsStore = {
             p.preset === 'orp-reticle'
           )
             preset = p.preset
+          if (p.readerEffect === 'none' || p.readerEffect === 'focus-bold' || p.readerEffect === 'orp-reticle')
+            readerEffect = p.readerEffect
         } catch {
           /* ignore corrupt storage */
         }

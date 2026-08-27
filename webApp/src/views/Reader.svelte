@@ -4,10 +4,13 @@
   import { refreshProgress, saveProgress, appState } from '../lib/stores.svelte'
   import type { Document } from '../lib/stores.svelte'
   import { setCurrentOffset, setJumpHandler } from '../lib/readerBus.svelte'
+  import { settingsStore } from '../lib/settings.svelte'
 
   let { document }: { document: Document } = $props()
 
   const TEXT = $derived(document.text ?? '')
+
+  const wordFx = $derived(settingsStore.readerEffect)
 
   interface StepRow {
     display: string
@@ -222,7 +225,11 @@
   })
 </script>
 
-<button type="button" class="word" aria-label="Play or pause" onclick={toggle}>{word}</button>
+<button type="button" class="word" aria-label="Play or pause" onclick={toggle}>
+  {#if wordFx === 'focus-bold'}<span class="bold-initial">{word.slice(0, 1)}</span>{word.slice(1)}
+  {:else}{word}{/if}
+  {#if wordFx === 'orp-reticle'}<span class="reticle" aria-hidden="true"></span>{/if}
+</button>
 <div class="controls">
   <div class="wpm-row">
     <label for="wpm">WPM {wpm}</label>
@@ -270,6 +277,31 @@
     user-select: none;
     width: 100%;
     text-align: center;
+    position: relative;
+  }
+  .bold-initial {
+    font-weight: 800;
+  }
+  .reticle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: var(--word-active-bg);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .reticle::before {
+    content: '';
+    position: absolute;
+    left: 35%;
+    top: 50%;
+    width: 2px;
+    height: 1.4em;
+    background: var(--word-active-fg);
+    transform: translate(-50%, -50%);
+    opacity: 0.6;
   }
   .controls {
     display: flex;
