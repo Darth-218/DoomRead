@@ -51,7 +51,7 @@
     }
     importError = ''
     try {
-      const doc = await addDocument(importTitle, importText, importChapters, importType)
+      const doc = await addDocument(importTitle, importText, importChapters, importType ?? 'txt')
       importText = ''
       importTitle = ''
       importChapters = undefined
@@ -116,7 +116,14 @@
   {:else}
     <ul class:grid={layout === 'grid'}>
       {#each documents as doc (doc.id)}
-        <li class="card">
+        <li
+          class="card"
+          title="Double-click to open"
+          ondblclick={(e) => {
+            if ((e.target as HTMLElement).closest('.menu-wrap')) return
+            onOpen(doc.id)
+          }}
+        >
           {@render item(doc)}
         </li>
       {/each}
@@ -274,6 +281,7 @@
     padding: 0.75rem 1rem;
     border: 1px solid var(--border);
     border-radius: 0.5rem;
+    cursor: pointer;
   }
   ul.grid li {
     position: relative;
