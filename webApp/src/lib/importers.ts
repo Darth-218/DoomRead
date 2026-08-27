@@ -11,9 +11,12 @@ export interface ChapterMeta {
   offset: number
 }
 
+export type DocType = 'pdf' | 'epub' | 'txt'
+
 export interface ImportResult {
   text: string
   chapters?: ChapterMeta[]
+  type?: DocType
 }
 
 export interface ImportOptions {
@@ -110,7 +113,7 @@ export async function extractPdf(
 
   const cleaned = clean ? cleanPdfPages(parts) : parts
   const text = cleaned.join('\n\n')
-  return { text }
+  return { text, type: 'pdf' }
 }
 
 export async function extractEpub(file: File): Promise<ImportResult> {
@@ -188,7 +191,7 @@ export async function extractEpub(file: File): Promise<ImportResult> {
   }
 
   if (!text.trim()) throw new Error('EPUB contained no extractable text')
-  return { text, chapters }
+  return { text, chapters, type: 'epub' }
 }
 
 export async function importFor(
@@ -198,5 +201,5 @@ export async function importFor(
   const lower = file.name.toLowerCase()
   if (lower.endsWith('.pdf')) return extractPdf(file, opts)
   if (lower.endsWith('.epub')) return extractEpub(file)
-  return { text: await file.text() }
+  return { text: await file.text(), type: 'txt' }
 }

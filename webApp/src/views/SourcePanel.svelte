@@ -1,7 +1,8 @@
 <script lang="ts">
   import { readerBus, jumpTo } from '../lib/readerBus.svelte'
+  import type { DocType } from '../lib/importers'
 
-  let { text }: { text: string } = $props()
+  let { text, type }: { text: string; type?: DocType } = $props()
 
   interface Node {
     type: 'word' | 'text'
@@ -57,7 +58,66 @@
     return res
   }
 
-  const nodes = $derived(build(text))
+  // --- PDF paging -----------------------------------------------------------
+  // PDFs import as one block of text with pages separated by blank lines, so a
+  // "page" is a maximal run delimited by /\n\n+/. Each page keeps its absolute
+  // [start,end] in the original string so word offsets stay aligned. Pages
+  // whose text is empty (e.g. fully stripped boilerplate) are dropped.
+  interface Page {
+    start: number
+    end: number
+    text: string
+    number: number
+  }
+
+  function pagesOf(source: string): Page[] {
+    const pages: Page[] = []
+    const re = /\n\n+/g
+    let last = 0
+    let n = 0
+    let m: RegExpExecArray | null
+    const push = (start: number, end: number) => {
+      const t = source.slice(start, end)
+      if (!t.trim()) return
+      n++
+      pages.push({ start, end, text: t, number: n })
+    }
+    while ((m = re.exec(source))) {
+      push(last, m.index)
+      last = m.index + m[0].length
+    }
+    push(last, source.length)
+    return pages
+  }
+
+  function pageIndexForOffset(pages: Page[], offset: number): number {
+    if (pages.length === 0) return -1
+    let res = 0
+    for (let i = 0; i < pages.length; i++) {
+      if (pages[i].start <= offset) res = i
+      else break
+    }
+    return res
+  }
+
+  const isPdf = $derived(type === 'pdf')
+  const pages = $derived(isPdf ? pagesOf(text) : [])
+  const currentPageIdx = $derived(
+    pages.length ? pageIndexForOffset(pages, readerBus.currentOffset) : -1,
+  )
+
+  // The slice of text we render: the whole document for non-PDF, or the
+  // current PDF page. Word nodes carry offsets absolute to the full text.
+  const sourceText = $derived(
+    isPdf && currentPageIdx >= 0 ? pages[currentPageIdx].text : text,
+  )
+  const baseOffset = $derived(
+    isPdf && currentPageIdx >= 0 ? pages[currentPageIdx].start : 0,
+  )
+
+  const nodes = $derived(
+    build(sourceText).map((node) => ({ ...node, offset: node.offset + baseOffset })),
+  )
   const activeIdx = $derived(indexForOffset(nodes, readerBus.currentOffset))
   const visible = $derived(
     nodes.length === 0
@@ -76,7 +136,30 @@
     const el = container.querySelector(`[data-offset="${off}"]`) as HTMLElement | null
     if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
   })
+
+  function goPage(delta: number, e: MouseEvent) {
+    const i = currentPageIdx + delta
+    if (i < 0 || i >= pages.length) return
+    jumpTo(pages[i].start)
+    ;(e.currentTarget as HTMLElement).blur()
+  }
 </script>
+
+{#if isPdf && pages.length > 0}
+  <div class="pager">
+    <button
+      type="button"
+      aria-label="Previous page"
+      disabled={currentPageIdx <= 0}
+      onclick={(e) => goPage(-1, e)}>←</button>
+    <span class="pageinfo">Page {pages[currentPageIdx].number} / {pages.length}</span>
+    <button
+      type="button"
+      aria-label="Next page"
+      disabled={currentPageIdx >= pages.length - 1}
+      onclick={(e) => goPage(1, e)}>→</button>
+  </div>
+{/if}
 
 <div class="source" bind:this={container}>
   {#each visible as node (node.offset)}
@@ -105,6 +188,31 @@
 </div>
 
 <style>
+  .pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .pager button {
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 0.4rem;
+    padding: 0.2rem 0.7rem;
+    cursor: pointer;
+    font: inherit;
+  }
+  .pager button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .pageinfo {
+    font-size: 0.9rem;
+    color: #555;
+    min-width: 7rem;
+    text-align: center;
+  }
   .source {
     flex: 1 1 0;
     min-width: 0;

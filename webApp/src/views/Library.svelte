@@ -1,12 +1,13 @@
 <script lang="ts">
   import { addDocument, deleteDocument, type Document, type ChapterMeta } from '../lib/stores.svelte'
-  import { importFor } from '../lib/importers'
+  import { importFor, type DocType } from '../lib/importers'
 
   let { documents, onOpen }: { documents: Document[]; onOpen: (id: string) => void } = $props()
 
   let importText = $state('')
   let importTitle = $state('')
   let importChapters = $state<ChapterMeta[] | undefined>(undefined)
+  let importType = $state<DocType | undefined>(undefined)
   let importError = $state('')
   let busy = $state(false)
   let cleanPdf = $state(true)
@@ -21,6 +22,7 @@
       const res = await importFor(file, { clean: cleanPdf })
       importText = res.text
       importChapters = res.chapters
+      importType = res.type
       if (!importTitle) importTitle = file.name.replace(/\.[^.]+$/, '')
     } catch (err) {
       importError = `Could not read file: ${err instanceof Error ? err.message : String(err)}`
@@ -37,10 +39,11 @@
     }
     importError = ''
     try {
-      const doc = await addDocument(importTitle, importText, importChapters)
+      const doc = await addDocument(importTitle, importText, importChapters, importType)
       importText = ''
       importTitle = ''
       importChapters = undefined
+      importType = undefined
       onOpen(doc.id)
     } catch (err) {
       importError = `Could not save document: ${err instanceof Error ? err.message : String(err)}`

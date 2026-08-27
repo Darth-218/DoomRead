@@ -4,6 +4,7 @@
 // object (properties are mutated, the object itself is never reassigned).
 import * as db from './db'
 import { LOREM_300 } from './lorem'
+import type { DocType } from './importers'
 
 export interface ChapterMeta {
   title: string
@@ -16,6 +17,7 @@ export interface Document {
   id: string
   title: string
   createdAt: string
+  type?: DocType
   text?: string
   chapters?: ChapterMeta[]
 }
@@ -102,12 +104,14 @@ export async function addDocument(
   title: string,
   text: string,
   chapters?: ChapterMeta[],
+  type?: DocType,
 ): Promise<Document> {
   const id = crypto.randomUUID()
   const doc: Document = {
     id,
     title: title.trim() || 'Untitled',
     createdAt: new Date().toISOString(),
+    type,
   }
   // Clone chapter metadata into plain objects: the values may arrive wrapped
   // in a Svelte $state Proxy, which IndexedDB's structured clone can't handle.
