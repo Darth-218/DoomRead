@@ -184,16 +184,15 @@
   })
 
   // Grow the rendered range as the user scrolls, so older/newer text appears
-  // before the edge is reached. Prepending above the viewport is anchored so the
-  // view doesn't jump; appending below needs no adjustment.
+  // before the edge is reached. Inserting nodes above the viewport is kept
+  // stable by the browser's native scroll anchoring, so we don't touch
+  // scrollTop here (doing so would fight it and snap back to the reader).
   async function onScroll() {
     if (isPdf || !container) return
     const { scrollTop, scrollHeight, clientHeight } = container
     if (scrollTop < SCROLL_TRIGGER && renderStart > 0) {
-      const h0 = scrollHeight
       renderStart = Math.max(0, renderStart - CHUNK)
       await tick()
-      container.scrollTop += container.scrollHeight - h0
     } else if (scrollHeight - (scrollTop + clientHeight) < SCROLL_TRIGGER && renderEnd < nodes.length) {
       renderEnd = Math.min(nodes.length, renderEnd + CHUNK)
       await tick()
