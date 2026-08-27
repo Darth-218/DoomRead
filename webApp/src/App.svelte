@@ -110,15 +110,16 @@
     padding: 3rem 1rem;
   }
   .reading {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
     gap: 1.5rem;
-    align-items: flex-start;
-    justify-content: center;
     width: 100%;
-    max-width: 1100px;
+    max-width: 1200px;
+    min-height: 72vh;
   }
   .pane {
-    flex: 1 1 0;
     min-width: 0;
     display: flex;
     flex-direction: column;
