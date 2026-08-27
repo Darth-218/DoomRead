@@ -222,6 +222,23 @@
   })
 </script>
 
+<div class="wpm-row">
+  <label for="wpm">WPM {wpm}</label>
+  <div class="wpm-control">
+    <button type="button" aria-label="Decrease speed" onclick={() => setWpm(wpm - 50)}>−50</button>
+    <input
+      id="wpm"
+      type="number"
+      min="100"
+      max="1000"
+      step="50"
+      value={wpm}
+      oninput={(e) => setWpm(+(e.currentTarget.value))}
+    />
+    <button type="button" aria-label="Increase speed" onclick={() => setWpm(wpm + 50)}>+50</button>
+  </div>
+  <span class="wpm-ghost" aria-hidden="true">WPM {wpm}</span>
+</div>
 <button type="button" class="word" aria-label="Play or pause" onclick={toggle}>{word}</button>
 <div class="controls">
   <button
@@ -229,23 +246,6 @@
     aria-label={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
     title={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
     onclick={toggle}>{running ? '⏸' : finished ? '↻' : '▶'}</button>
-  <div class="wpm-row">
-    <label for="wpm">WPM {wpm}</label>
-    <div class="wpm-control">
-      <button type="button" aria-label="Decrease speed" onclick={() => setWpm(wpm - 50)}>−50</button>
-      <input
-        id="wpm"
-        type="number"
-        min="100"
-        max="1000"
-        step="50"
-        value={wpm}
-        oninput={(e) => setWpm(+(e.currentTarget.value))}
-      />
-      <button type="button" aria-label="Increase speed" onclick={() => setWpm(wpm + 50)}>+50</button>
-    </div>
-    <span class="wpm-ghost" aria-hidden="true">WPM {wpm}</span>
-  </div>
 </div>
 <p class="meta">
   {#if finished}
