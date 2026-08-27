@@ -117,13 +117,14 @@
     gap: 1.5rem;
     width: 100%;
     max-width: 1200px;
-    min-height: 72vh;
+    min-height: 80vh;
   }
   .pane {
     min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
   }
 </style>

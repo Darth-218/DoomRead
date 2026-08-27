@@ -232,8 +232,8 @@
     padding: 1.25rem 1.5rem;
     border: 1px solid #ddd;
     border-radius: 0.5rem;
-    line-height: 1.8;
-    font-size: 1.35rem;
+    line-height: 1.9;
+    font-size: 1.05rem;
     white-space: pre-wrap;
     word-break: break-word;
     user-select: none;
