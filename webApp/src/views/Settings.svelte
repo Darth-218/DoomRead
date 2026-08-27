@@ -1,5 +1,6 @@
 <script lang="ts">
   import { settingsStore } from '../lib/settings.svelte'
+  import EditableNumber from './EditableNumber.svelte'
 
   const displayModes = [
     { id: 'light', label: 'Light' },
@@ -59,7 +60,17 @@
   </section>
 
   <section>
-    <h3>Reading size <span class="value">{settingsStore.fontSize.toFixed(1)}rem</span></h3>
+    <h3>Reading size
+      <EditableNumber
+        value={settingsStore.fontSize}
+        min={1}
+        max={8}
+        step={0.1}
+        decimals={1}
+        suffix="rem"
+        onCommit={(n) => settingsStore.setFontSize(n)}
+      />
+    </h3>
     <input
       type="range"
       min="1"
@@ -71,7 +82,16 @@
   </section>
 
   <section>
-    <h3>Line spacing <span class="value">{settingsStore.lineSpacing.toFixed(2)}</span></h3>
+    <h3>Line spacing
+      <EditableNumber
+        value={settingsStore.lineSpacing}
+        min={1.2}
+        max={3}
+        step={0.1}
+        decimals={2}
+        onCommit={(n) => settingsStore.setLineSpacing(n)}
+      />
+    </h3>
     <input
       type="range"
       min="1.2"
@@ -112,11 +132,6 @@
     align-items: baseline;
     gap: 0.5rem;
   }
-  .value {
-    font-weight: 400;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
   .choices {
     display: flex;
     flex-wrap: wrap;
@@ -146,10 +161,15 @@
   }
   .preview {
     margin: 0;
+    height: 9rem;
+    min-height: 9rem;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
     font-family: var(--reader-font-family);
     font-size: var(--reader-font-size);
-    line-height: 1.2;
-    padding: 1rem 1.25rem;
+    line-height: var(--reader-line-height);
+    padding: 0 1.25rem;
     border: 1px solid var(--border);
     border-radius: 0.5rem;
     background: var(--surface);
