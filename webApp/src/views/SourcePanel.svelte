@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte'
   import { readerBus, jumpTo } from '../lib/readerBus.svelte'
   import type { DocType } from '../lib/importers'
 
@@ -36,10 +37,15 @@
     return nodes
   }
 
-  // Only render a window of words around the current reading position so the
-  // DOM stays bounded no matter how long the document is.
-  const WINDOW_BEFORE = 100
-  const WINDOW_AFTER = 300
+  // Render a sliding window of words around the current reading position so the
+  // DOM stays bounded. BUFFER_* is the base look-behind/ahead around the reader
+  // (doubled from the old window); manual scrolling grows the range further via
+  // CHUNK loads so the whole document can be browsed seamlessly.
+  const BUFFER_BEFORE = 200
+  const BUFFER_AFTER = 600
+  const EDGE = 40
+  const CHUNK = 120
+  const SCROLL_TRIGGER = 240
 
   // Largest index whose node starts at or before `offset` (nodes are sorted).
   function indexForOffset(nodes: Node[], offset: number): number {
@@ -119,18 +125,20 @@
     build(sourceText).map((node) => ({ ...node, offset: node.offset + baseOffset })),
   )
   const activeIdx = $derived(indexForOffset(nodes, readerBus.currentOffset))
-  // In paginated (PDF) mode a page is shown whole and swaps to the next page
-  // when the RSVP cursor crosses the boundary; windowing is only needed for the
-  // unbounded whole-document (epub/txt) view.
+
+  // Stateful slice of `nodes` we actually render. For PDF the whole page is
+  // shown; for the unbounded whole-document (epub/txt) view this window slides
+  // with the reader and grows on manual scroll.
+  let renderStart = $state(0)
+  let renderEnd = $state(0)
+
+  function expandTo(i: number) {
+    renderStart = Math.max(0, i - BUFFER_BEFORE)
+    renderEnd = Math.min(nodes.length, i + BUFFER_AFTER + 1)
+  }
+
   const visible = $derived(
-    nodes.length === 0
-      ? []
-      : isPdf
-        ? nodes
-        : nodes.slice(
-            Math.max(0, activeIdx - WINDOW_BEFORE),
-            Math.min(nodes.length, activeIdx + WINDOW_AFTER + 1),
-          ),
+    nodes.length === 0 ? [] : isPdf ? nodes : nodes.slice(renderStart, renderEnd),
   )
 
   // Reading completion (% through the source text) shown in the pager slot for
@@ -149,6 +157,48 @@
     const el = container.querySelector(`[data-offset="${off}"]`) as HTMLElement | null
     if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
   })
+
+  // When a new document (set of nodes) loads, (re)initialize the window around
+  // the reader and reset scroll to the top. Guarded so it only fires on a nodes
+  // change, not on every reader tick.
+  let lastNodes: Node[] | null = null
+  $effect(() => {
+    const n = nodes
+    if (n === lastNodes) return
+    lastNodes = n
+    if (n.length === 0) {
+      renderStart = 0
+      renderEnd = 0
+      return
+    }
+    expandTo(activeIdx)
+    if (container) container.scrollTop = 0
+  })
+
+  // Keep the reader's word inside the rendered window as RSVP advances or when a
+  // seek/click lands near the edge; the fixed buffer also drops text behind you.
+  $effect(() => {
+    const i = activeIdx
+    if (!isPdf || nodes.length === 0) return
+    if (i < renderStart + EDGE || i >= renderEnd - EDGE) expandTo(i)
+  })
+
+  // Grow the rendered range as the user scrolls, so older/newer text appears
+  // before the edge is reached. Prepending above the viewport is anchored so the
+  // view doesn't jump; appending below needs no adjustment.
+  async function onScroll() {
+    if (isPdf || !container) return
+    const { scrollTop, scrollHeight, clientHeight } = container
+    if (scrollTop < SCROLL_TRIGGER && renderStart > 0) {
+      const h0 = scrollHeight
+      renderStart = Math.max(0, renderStart - CHUNK)
+      await tick()
+      container.scrollTop += container.scrollHeight - h0
+    } else if (scrollHeight - (scrollTop + clientHeight) < SCROLL_TRIGGER && renderEnd < nodes.length) {
+      renderEnd = Math.min(nodes.length, renderEnd + CHUNK)
+      await tick()
+    }
+  }
 
   function goPage(delta: number, e: MouseEvent) {
     const i = currentPageIdx + delta
@@ -184,7 +234,7 @@
 </script>
 
 <div class="panel">
-  <div class="source" bind:this={container}>
+  <div class="source" bind:this={container} onscroll={onScroll}>
     {#each visible as node (node.offset)}
       {#if node.type === 'word'}
         <span
