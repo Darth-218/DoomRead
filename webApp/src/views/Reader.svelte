@@ -262,7 +262,8 @@
     background: none;
     padding: 0;
     font: inherit;
-    font-size: 3rem;
+    font-family: var(--reader-font-family);
+    font-size: var(--reader-font-size);
     min-height: 3.5rem;
     margin: 0;
     cursor: pointer;

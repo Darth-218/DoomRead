@@ -396,8 +396,9 @@
     max-height: 80vh;
     overflow: auto;
     padding: 1.5rem 1.75rem;
-    line-height: 1.9;
+    line-height: var(--reader-line-height);
     font-size: 1.05rem;
+    font-family: var(--reader-font-family);
     white-space: pre-wrap;
     word-break: break-word;
     user-select: none;
