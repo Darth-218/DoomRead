@@ -130,10 +130,10 @@
   }
   .title {
     padding: 0.4rem 0.6rem;
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--fg);
     border-radius: 0.4rem;
     font: inherit;
-    background: var(--surface);
+    background: var(--bg);
     color: var(--fg);
   }
   textarea {
@@ -141,10 +141,10 @@
     min-height: 6rem;
     resize: vertical;
     padding: 0.5rem;
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--fg);
     border-radius: 0.4rem;
     font: inherit;
-    background: var(--surface);
+    background: var(--bg);
     color: var(--fg);
   }
   .row {
@@ -159,6 +159,9 @@
     gap: 0.4rem;
     font-size: 0.85rem;
     color: var(--muted-2);
+  }
+  .opt input[type='checkbox'] {
+    accent-color: var(--fg);
   }
   .error {
     color: var(--danger);
@@ -200,14 +203,20 @@
   }
   button {
     cursor: pointer;
-    border: none;
-    background: var(--nav-active-bg);
-    color: var(--nav-active-fg);
+    border: 1px solid var(--fg);
+    background: var(--bg);
+    color: var(--fg);
     padding: 0.4rem 0.9rem;
     border-radius: 0.4rem;
     flex-shrink: 0;
+    font: inherit;
+  }
+  button:hover {
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
   }
   button.remove {
     background: var(--danger);
+    color: #fff;
+    border-color: var(--danger);
   }
 </style>
