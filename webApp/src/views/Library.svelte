@@ -14,6 +14,15 @@
   let cleanPdf = $state(true)
   let showImport = $state(false)
   let layout = $state<'list' | 'grid'>('list')
+  let openMenu = $state<string | null>(null)
+
+  function toggleMenu(id: string) {
+    openMenu = openMenu === id ? null : id
+  }
+  function choose(fn: () => void) {
+    fn()
+    openMenu = null
+  }
 
   async function onFile(e: Event) {
     const input = e.currentTarget as HTMLInputElement
@@ -115,6 +124,10 @@
   {/if}
 </div>
 
+{#if openMenu}
+  <div class="menu-backdrop" role="presentation" onclick={() => (openMenu = null)}></div>
+{/if}
+
 {#snippet item(doc: Document)}
   <span class="title">{doc.title}</span>
   <span class="chips">
@@ -123,12 +136,24 @@
       <span class="chip default">DEFAULT</span>
     {/if}
   </span>
-  <span class="actions">
-    <button onclick={() => onOpen(doc.id)}>Open</button>
+  <span class="menu-wrap">
     <button
-      class:active={settingsStore.defaultDocId === doc.id}
-      onclick={() => settingsStore.setDefaultDoc(doc.id)}>Default</button>
-    <button class="remove" onclick={() => remove(doc.id)}>Remove</button>
+      class="more"
+      type="button"
+      aria-label="More options"
+      aria-haspopup="true"
+      aria-expanded={openMenu === doc.id}
+      onclick={() => toggleMenu(doc.id)}>⋮</button>
+    {#if openMenu === doc.id}
+      <div class="menu" role="menu">
+        <button role="menuitem" onclick={() => choose(() => onOpen(doc.id))}>Open</button>
+        <button
+          role="menuitem"
+          class:active={settingsStore.defaultDocId === doc.id}
+          onclick={() => choose(() => settingsStore.setDefaultDoc(doc.id))}>Default</button>
+        <button role="menuitem" class="remove" onclick={() => choose(() => void remove(doc.id))}>Remove</button>
+      </div>
+    {/if}
   </span>
 {/snippet}
 
@@ -251,9 +276,15 @@
     border-radius: 0.5rem;
   }
   ul.grid li {
+    position: relative;
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+  ul.grid .menu-wrap {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
   }
   .library .title {
     overflow: hidden;
@@ -284,10 +315,49 @@
     color: var(--bg);
     border-color: var(--fg);
   }
-  .actions {
-    display: flex;
-    gap: 0.5rem;
+  .menu-wrap {
+    position: relative;
     flex-shrink: 0;
+  }
+  .more {
+    border: none;
+    background: none;
+    color: var(--muted-2);
+    font-size: 1.3rem;
+    line-height: 1;
+    padding: 0 0.3rem;
+    cursor: pointer;
+    border-radius: 0.3rem;
+  }
+  .more:hover {
+    color: var(--fg);
+    background: color-mix(in srgb, var(--fg) 12%, var(--bg));
+  }
+  .menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 0.3rem;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    min-width: 8rem;
+    padding: 0.25rem;
+    gap: 0.15rem;
+    background: var(--bg);
+    border: 1px solid var(--fg);
+    border-radius: 0.4rem;
+  }
+  .menu button {
+    text-align: left;
+    justify-content: flex-start;
+    padding: 0.4rem 0.6rem;
+    border: none;
+  }
+  .menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
   }
   button {
     cursor: pointer;
