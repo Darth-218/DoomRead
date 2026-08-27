@@ -105,9 +105,11 @@
     color: #fff;
   }
   .view {
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 1rem;
     padding: 3rem 1rem;
   }
