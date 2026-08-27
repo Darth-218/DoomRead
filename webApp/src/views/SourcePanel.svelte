@@ -150,47 +150,49 @@
   }
 </script>
 
-<div class="source" bind:this={container}>
-  {#each visible as node (node.offset)}
-    {#if node.type === 'word'}
-      <span
-        class="word"
-        class:active={node.offset === readerBus.currentOffset}
-        data-offset={node.offset}
-        role="button"
-        tabindex="0"
-        onclick={(e) => {
-          jumpTo(node.offset)
-          e.currentTarget.blur()
-        }}
-        onkeydown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
+<div class="panel">
+  <div class="source" bind:this={container}>
+    {#each visible as node (node.offset)}
+      {#if node.type === 'word'}
+        <span
+          class="word"
+          class:active={node.offset === readerBus.currentOffset}
+          data-offset={node.offset}
+          role="button"
+          tabindex="0"
+          onclick={(e) => {
             jumpTo(node.offset)
             e.currentTarget.blur()
-          }
-        }}>{node.text}</span>
-    {:else}
-      <span class="text">{node.text}</span>
-    {/if}
-  {/each}
-</div>
-
-{#if isPdf && pages.length > 0}
-  <div class="pager">
-    <button
-      type="button"
-      aria-label="Previous page"
-      disabled={currentPageIdx <= 0}
-      onclick={(e) => goPage(-1, e)}>←</button>
-    <span class="pageinfo">Page {pages[currentPageIdx].number} / {pages.length}</span>
-    <button
-      type="button"
-      aria-label="Next page"
-      disabled={currentPageIdx >= pages.length - 1}
-      onclick={(e) => goPage(1, e)}>→</button>
+          }}
+          onkeydown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              jumpTo(node.offset)
+              e.currentTarget.blur()
+            }
+          }}>{node.text}</span>
+      {:else}
+        <span class="text">{node.text}</span>
+      {/if}
+    {/each}
   </div>
-{/if}
+
+  {#if isPdf && pages.length > 0}
+    <div class="pager">
+      <button
+        type="button"
+        aria-label="Previous page"
+        disabled={currentPageIdx <= 0}
+        onclick={(e) => goPage(-1, e)}>←</button>
+      <span class="pageinfo">Page {pages[currentPageIdx].number} / {pages.length}</span>
+      <button
+        type="button"
+        aria-label="Next page"
+        disabled={currentPageIdx >= pages.length - 1}
+        onclick={(e) => goPage(1, e)}>→</button>
+    </div>
+  {/if}
+</div>
 
 <style>
   .pager {
@@ -217,6 +219,12 @@
     color: #555;
     min-width: 7rem;
     text-align: center;
+  }
+  .panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-width: 0;
   }
   .source {
     flex: 1 1 0;
