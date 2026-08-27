@@ -45,9 +45,9 @@
   .chip {
     flex: 0 0 auto;
     white-space: nowrap;
-    border: 1px solid #ddd;
-    background: #fff;
-    color: #444;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted-2);
     padding: 0.35rem 0.75rem;
     border-radius: 999px;
     font: inherit;
@@ -55,11 +55,11 @@
     cursor: pointer;
   }
   .chip:hover {
-    background: #f0f0f0;
+    background: var(--hover);
   }
   .chip.active {
-    background: #222;
-    color: #fff;
-    border-color: #222;
+    background: var(--nav-active-bg);
+    color: var(--nav-active-fg);
+    border-color: var(--nav-active-bg);
   }
 </style>

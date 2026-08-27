@@ -43,7 +43,7 @@
     background: #22c55e;
   }
   .meta {
-    color: #666;
+    color: var(--muted);
     font-size: 0.9rem;
     margin: 0;
   }

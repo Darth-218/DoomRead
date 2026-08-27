@@ -1,7 +1,40 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
   line-height: 1.5;
+
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #666666;
+  --muted-2: #555555;
+  --border: #dddddd;
+  --border-strong: #cccccc;
+  --surface: #ffffff;
+  --hover: #f0f0f0;
+  --hover-2: #eeeeee;
+  --nav-active-bg: #222222;
+  --nav-active-fg: #ffffff;
+  --word-active-bg: #ffe08a;
+  --word-active-fg: #111111;
+  --danger: #e02424;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #15171a;
+  --fg: #e6e6e6;
+  --muted: #9aa0a6;
+  --muted-2: #b0b6bd;
+  --border: #2c2f33;
+  --border-strong: #3a3d42;
+  --surface: #1c1f23;
+  --hover: #26292e;
+  --hover-2: #2a2d33;
+  --nav-active-bg: #3a3d42;
+  --nav-active-fg: #ffffff;
+  --word-active-bg: #5c4a16;
+  --word-active-fg: #f5f5f5;
 }
 
 * {
@@ -11,6 +44,8 @@
 body {
   margin: 0;
   min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
 }
 
 #app {

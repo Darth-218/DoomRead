@@ -276,8 +276,9 @@
     margin-bottom: 0.5rem;
   }
   .pager button {
-    border: 1px solid #ddd;
-    background: #fff;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--fg);
     border-radius: 0.4rem;
     padding: 0.2rem 0.7rem;
     cursor: pointer;
@@ -292,22 +293,22 @@
   }
   .pageinfo {
     font-size: 0.9rem;
-    color: #555;
+    color: var(--muted-2);
     min-width: 7rem;
     text-align: center;
   }
   .pageinfo:hover {
-    color: #111;
+    color: var(--fg);
     text-decoration: underline;
     cursor: text;
   }
   .pageinput {
     font: inherit;
     font-size: 0.9rem;
-    color: #111;
+    color: var(--fg);
     min-width: 7rem;
     text-align: center;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 0.3rem;
     padding: 0.15rem 0.4rem;
   }
@@ -342,11 +343,11 @@
     padding: 0 1px;
   }
   .word:hover {
-    background: #f0f0f0;
+    background: var(--hover);
   }
   .word.active {
-    background: #ffe08a;
-    color: #111;
+    background: var(--word-active-bg);
+    color: var(--word-active-fg);
     font-weight: 600;
   }
 </style>

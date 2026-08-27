@@ -7,6 +7,7 @@
   import SpaceTest from './views/SpaceTest.svelte'
   import SourcePanel from './views/SourcePanel.svelte'
   import { getActiveDoc, init, openDocument, appState } from './lib/stores.svelte'
+  import { themeStore } from './lib/theme.svelte'
 
   type View = 'reader' | 'library' | 'stats' | 'settings' | 'spacetest'
 
@@ -23,6 +24,7 @@
   const activeDoc = $derived(getActiveDoc())
 
   onMount(() => {
+    themeStore.init()
     void init()
   })
 
@@ -34,13 +36,21 @@
 
 <header class="appbar">
   <span class="brand">DoomRead</span>
-  <nav>
-    {#each nav as item}
-      <button class:active={view === item.id} onclick={() => (view = item.id)}>
-        {item.label}
-      </button>
-    {/each}
-  </nav>
+  <div class="appbar-right">
+    <nav>
+      {#each nav as item}
+        <button class:active={view === item.id} onclick={() => (view = item.id)}>
+          {item.label}
+        </button>
+      {/each}
+    </nav>
+    <button
+      class="theme-toggle"
+      type="button"
+      aria-label="Toggle dark mode"
+      title="Toggle dark mode"
+      onclick={() => themeStore.toggle()}>{themeStore.value === 'dark' ? '☀' : '☾'}</button>
+  </div>
 </header>
 
 <main class="view">
@@ -75,7 +85,12 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 0.75rem 1.5rem;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border);
+  }
+  .appbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
   .brand {
     font-weight: 700;
@@ -91,14 +106,29 @@
     padding: 0.4rem 0.75rem;
     border-radius: 0.4rem;
     cursor: pointer;
-    color: #444;
+    color: var(--muted-2);
   }
   nav button:hover {
-    background: #eee;
+    background: var(--hover-2);
   }
   nav button.active {
-    background: #222;
-    color: #fff;
+    background: var(--nav-active-bg);
+    color: var(--nav-active-fg);
+  }
+  .theme-toggle {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--fg);
+    border-radius: 0.4rem;
+    width: 2.2rem;
+    height: 2.2rem;
+    font: inherit;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .theme-toggle:hover {
+    background: var(--hover-2);
   }
   .view {
     flex: 1 1 auto;

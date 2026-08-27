@@ -10,6 +10,6 @@
     align-items: center;
     gap: 0.5rem;
     padding: 3rem 1rem;
-    color: #666;
+    color: var(--muted);
   }
 </style>

@@ -122,7 +122,7 @@
     gap: 0.5rem;
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 0.5rem;
   }
   .import h3 {
@@ -130,18 +130,22 @@
   }
   .title {
     padding: 0.4rem 0.6rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-strong);
     border-radius: 0.4rem;
     font: inherit;
+    background: var(--surface);
+    color: var(--fg);
   }
   textarea {
     width: 100%;
     min-height: 6rem;
     resize: vertical;
     padding: 0.5rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-strong);
     border-radius: 0.4rem;
     font: inherit;
+    background: var(--surface);
+    color: var(--fg);
   }
   .row {
     display: flex;
@@ -154,15 +158,15 @@
     align-items: center;
     gap: 0.4rem;
     font-size: 0.85rem;
-    color: #555;
+    color: var(--muted-2);
   }
   .error {
-    color: #e02424;
+    color: var(--danger);
     margin: 0;
     font-size: 0.85rem;
   }
   .empty {
-    color: #666;
+    color: var(--muted);
   }
   ul {
     list-style: none;
@@ -179,7 +183,7 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 0.75rem 1rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 0.5rem;
   }
   .actions {
@@ -197,13 +201,13 @@
   button {
     cursor: pointer;
     border: none;
-    background: #222;
-    color: #fff;
+    background: var(--nav-active-bg);
+    color: var(--nav-active-fg);
     padding: 0.4rem 0.9rem;
     border-radius: 0.4rem;
     flex-shrink: 0;
   }
   button.remove {
-    background: #e02424;
+    background: var(--danger);
   }
 </style>
