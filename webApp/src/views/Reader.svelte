@@ -248,13 +248,6 @@
     onclick={toggle}>{running ? '⏸' : finished ? '↻' : '▶'}</button>
 </div>
 <p class="meta">
-  {#if finished}
-    done — {steps.length} steps
-  {:else}
-    word {idx + 1} of {steps.length}
-  {/if}
-</p>
-<p class="meta">
   <button class="help" type="button" aria-label="Reading controls help">
     ?
     <span class="tooltip">space: tap to step · hold to read · release to pause · ←/→ step · click word to play/pause</span>

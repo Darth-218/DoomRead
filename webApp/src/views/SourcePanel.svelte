@@ -149,6 +149,21 @@
       : 0,
   )
 
+  // Word progress ("word X of Y") shown beneath the pager for non-PDF docs.
+  // wordCountUpTo[i] is the number of word nodes among nodes[0..i], so the
+  // current/total counts are O(1) lookups after one O(n) pass per document.
+  const wordCountUpTo = $derived.by(() => {
+    const counts: number[] = []
+    let c = 0
+    for (let i = 0; i < nodes.length; i++) {
+      if (nodes[i].type === 'word') c++
+      counts.push(c)
+    }
+    return counts
+  })
+  const totalWords = $derived(wordCountUpTo.length ? wordCountUpTo[wordCountUpTo.length - 1] : 0)
+  const currentWord = $derived(wordCountUpTo[activeIdx] ?? 0)
+
   let container: HTMLElement | null = $state(null)
 
   $effect(() => {
@@ -313,6 +328,9 @@
       <button type="button" class="phantom" aria-hidden="true" tabindex="-1">→</button>
     {/if}
   </div>
+  {#if !isPdf}
+    <p class="wordcount">word {currentWord} of {totalWords}</p>
+  {/if}
 </div>
 
 <style>
@@ -360,6 +378,12 @@
     border: 1px solid var(--border);
     border-radius: 0.3rem;
     padding: 0.15rem 0.4rem;
+  }
+  .wordcount {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+    text-align: center;
   }
   .panel {
     display: flex;
