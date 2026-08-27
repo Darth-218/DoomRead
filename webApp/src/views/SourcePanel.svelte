@@ -156,6 +156,31 @@
     jumpTo(pages[i].start)
     ;(e.currentTarget as HTMLElement).blur()
   }
+
+  // Click / tap the page indicator to type a page number and jump straight to
+  // it. Entries are clamped to the valid range and escape/blur cancels.
+  let editingPage = $state(false)
+  let pageInput = $state('')
+  let pageInputEl = $state<HTMLInputElement | null>(null)
+
+  function startEditPage() {
+    if (!isPdf || pages.length === 0) return
+    pageInput = String(pages[currentPageIdx].number)
+    editingPage = true
+  }
+
+  function commitPage() {
+    if (!editingPage) return
+    const v = parseInt(pageInput, 10)
+    editingPage = false
+    if (!Number.isFinite(v)) return
+    const i = Math.min(pages.length, Math.max(1, v)) - 1
+    jumpTo(pages[i].start)
+  }
+
+  $effect(() => {
+    if (editingPage && pageInputEl) pageInputEl.focus()
+  })
 </script>
 
 <div class="panel">
@@ -192,7 +217,39 @@
         aria-label="Previous page"
         disabled={currentPageIdx <= 0}
         onclick={(e) => goPage(-1, e)}>←</button>
-      <span class="pageinfo">Page {pages[currentPageIdx].number} / {pages.length}</span>
+      {#if editingPage}
+        <input
+          class="pageinput"
+          type="text"
+          inputmode="numeric"
+          bind:this={pageInputEl}
+          bind:value={pageInput}
+          onkeydown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              e.currentTarget.blur()
+            } else if (e.key === 'Escape') {
+              e.preventDefault()
+              editingPage = false
+            }
+          }}
+          onblur={commitPage}
+          size="3"
+        />
+      {:else}
+        <span
+          class="pageinfo"
+          role="button"
+          tabindex="0"
+          title="Click to jump to a page"
+          onclick={startEditPage}
+          onkeydown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              startEditPage()
+            }
+          }}>Page {pages[currentPageIdx].number} / {pages.length}</span>
+      {/if}
       <button
         type="button"
         aria-label="Next page"
@@ -238,6 +295,21 @@
     color: #555;
     min-width: 7rem;
     text-align: center;
+  }
+  .pageinfo:hover {
+    color: #111;
+    text-decoration: underline;
+    cursor: text;
+  }
+  .pageinput {
+    font: inherit;
+    font-size: 0.9rem;
+    color: #111;
+    min-width: 7rem;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 0.3rem;
+    padding: 0.15rem 0.4rem;
   }
   .panel {
     display: flex;
