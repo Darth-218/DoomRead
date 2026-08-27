@@ -119,13 +119,18 @@
     build(sourceText).map((node) => ({ ...node, offset: node.offset + baseOffset })),
   )
   const activeIdx = $derived(indexForOffset(nodes, readerBus.currentOffset))
+  // In paginated (PDF) mode a page is shown whole and swaps to the next page
+  // when the cursor crosses the boundary; windowing is only needed for the
+  // unbounded whole-document (epub/txt) view.
   const visible = $derived(
     nodes.length === 0
       ? []
-      : nodes.slice(
-          Math.max(0, activeIdx - WINDOW_BEFORE),
-          Math.min(nodes.length, activeIdx + WINDOW_AFTER + 1),
-        ),
+      : isPdf
+        ? nodes
+        : nodes.slice(
+            Math.max(0, activeIdx - WINDOW_BEFORE),
+            Math.min(nodes.length, activeIdx + WINDOW_AFTER + 1),
+          ),
   )
 
   let container: HTMLElement | null = $state(null)
