@@ -19,6 +19,7 @@
 
   let editing = $state(false)
   let draft = $state('')
+  let inputEl = $state<HTMLInputElement | null>(null)
 
   function startEdit() {
     draft = String(value)
@@ -26,10 +27,9 @@
   }
 
   function commit() {
+    if (!editing) return
     const n = Number(draft)
-    if (Number.isFinite(n)) {
-      onCommit(Math.min(max, Math.max(min, n)))
-    }
+    if (Number.isFinite(n)) onCommit(Math.min(max, Math.max(min, n)))
     editing = false
   }
 
@@ -37,31 +37,31 @@
     editing = false
   }
 
-  function focusInput(node: HTMLInputElement) {
-    node.focus()
-    node.select()
-  }
+  $effect(() => {
+    if (editing && inputEl) {
+      inputEl.focus()
+      inputEl.select()
+    }
+  })
 </script>
 
 {#if editing}
   <input
     class="edit"
-    type="number"
-    {min}
-    {max}
-    {step}
+    type="text"
+    inputmode="decimal"
+    bind:this={inputEl}
     bind:value={draft}
-    onblur={commit}
     onkeydown={(e) => {
       if (e.key === 'Enter') {
         e.preventDefault()
-        commit()
+        e.currentTarget.blur()
       } else if (e.key === 'Escape') {
         e.preventDefault()
         cancel()
       }
     }}
-    use:focusInput
+    onblur={commit}
   />
 {:else}
   <button type="button" class="value" onclick={startEdit}>{value.toFixed(decimals)}{suffix}</button>
