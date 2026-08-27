@@ -120,7 +120,7 @@
   )
   const activeIdx = $derived(indexForOffset(nodes, readerBus.currentOffset))
   // In paginated (PDF) mode a page is shown whole and swaps to the next page
-  // when the cursor crosses the boundary; windowing is only needed for the
+  // when the RSVP cursor crosses the boundary; windowing is only needed for the
   // unbounded whole-document (epub/txt) view.
   const visible = $derived(
     nodes.length === 0
@@ -131,6 +131,14 @@
             Math.max(0, activeIdx - WINDOW_BEFORE),
             Math.min(nodes.length, activeIdx + WINDOW_AFTER + 1),
           ),
+  )
+
+  // Reading completion (% through the source text) shown in the pager slot for
+  // non-PDF docs so the pager reserves identical vertical space across types.
+  const completionPct = $derived(
+    text.length > 0
+      ? Math.min(100, Math.round((readerBus.currentOffset / text.length) * 100))
+      : 0,
   )
 
   let container: HTMLElement | null = $state(null)
@@ -177,8 +185,8 @@
     {/each}
   </div>
 
-  {#if isPdf && pages.length > 0}
-    <div class="pager">
+  <div class="pager">
+    {#if isPdf && pages.length > 0}
       <button
         type="button"
         aria-label="Previous page"
@@ -190,8 +198,15 @@
         aria-label="Next page"
         disabled={currentPageIdx >= pages.length - 1}
         onclick={(e) => goPage(1, e)}>→</button>
-    </div>
-  {/if}
+    {:else}
+      <!-- Phantom controls: invisible but space-identical to the PDF pager,
+           with a completion percentage in the middle so the page height
+           stays the same across document types. -->
+      <button type="button" class="phantom" aria-hidden="true" tabindex="-1">←</button>
+      <span class="pageinfo">{completionPct}% read</span>
+      <button type="button" class="phantom" aria-hidden="true" tabindex="-1">→</button>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -214,6 +229,9 @@
     opacity: 0.4;
     cursor: default;
   }
+  .pager button.phantom {
+    visibility: hidden;
+  }
   .pageinfo {
     font-size: 0.9rem;
     color: #555;
@@ -230,7 +248,7 @@
     min-width: 0;
     max-height: 80vh;
     overflow: auto;
-    padding: 1.25rem 1.5rem;
+    padding: 1.5rem 1.75rem;
     border: 1px solid #ddd;
     border-radius: 0.5rem;
     line-height: 1.9;

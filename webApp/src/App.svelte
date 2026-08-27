@@ -114,7 +114,7 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
     grid-template-rows: minmax(0, 1fr);
     align-items: stretch;
-    gap: 1.5rem;
+    gap: 2.5rem;
     width: 100%;
     max-width: 1200px;
     min-height: 80vh;
@@ -125,6 +125,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 1.25rem;
     text-align: center;
   }
 </style>
