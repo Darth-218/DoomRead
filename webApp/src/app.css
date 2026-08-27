@@ -17,6 +17,29 @@
   --word-active-bg: #ffe08a;
   --word-active-fg: #111111;
   --danger: #e02424;
+
+  --reader-font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
+  --reader-font-size: 3rem;
+  --reader-line-height: 1.9;
+}
+
+[data-theme="sepia"] {
+  color-scheme: light;
+
+  --bg: #f4ecd8;
+  --fg: #5b4636;
+  --muted: #8a7559;
+  --muted-2: #7a6450;
+  --border: #d8c9a8;
+  --border-strong: #c8b894;
+  --surface: #efe6d0;
+  --hover: #e7dcc2;
+  --hover-2: #e0d3b4;
+  --nav-active-bg: #5b4636;
+  --nav-active-fg: #f4ecd8;
+  --word-active-bg: #d9c9a3;
+  --word-active-fg: #4a3826;
+  --danger: #b3402f;
 }
 
 [data-theme="dark"] {

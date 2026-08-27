@@ -7,7 +7,7 @@
   import SpaceTest from './views/SpaceTest.svelte'
   import SourcePanel from './views/SourcePanel.svelte'
   import { getActiveDoc, init, openDocument, appState } from './lib/stores.svelte'
-  import { themeStore } from './lib/theme.svelte'
+  import { settingsStore } from './lib/settings.svelte'
 
   type View = 'reader' | 'library' | 'stats' | 'settings' | 'spacetest'
 
@@ -24,7 +24,7 @@
   const activeDoc = $derived(getActiveDoc())
 
   onMount(() => {
-    themeStore.init()
+    settingsStore.init()
     void init()
   })
 
@@ -47,9 +47,9 @@
     <button
       class="theme-toggle"
       type="button"
-      aria-label="Toggle dark mode"
-      title="Toggle dark mode"
-      onclick={() => themeStore.toggle()}>{themeStore.value === 'dark' ? '☀' : '☾'}</button>
+      aria-label="Cycle display mode"
+      title="Cycle display mode"
+      onclick={() => settingsStore.cycleDisplay()}>{settingsStore.displayMode === 'dark' ? '☀' : settingsStore.displayMode === 'sepia' ? 'Ⓢ' : '☾'}</button>
   </div>
 </header>
 
