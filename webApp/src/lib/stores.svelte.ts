@@ -109,11 +109,16 @@ export async function addDocument(
     title: title.trim() || 'Untitled',
     createdAt: new Date().toISOString(),
   }
+  // Clone chapter metadata into plain objects: the values may arrive wrapped
+  // in a Svelte $state Proxy, which IndexedDB's structured clone can't handle.
+  const plainChapters = chapters
+    ? chapters.map((c) => ({ title: String(c.title), offset: Number(c.offset) }))
+    : undefined
   await db.put('documents', doc)
   // Keep the heavy text out of the document list.
-  await db.put('contents', { id, text, chapters } satisfies Content)
+  await db.put('contents', { id, text, chapters: plainChapters } satisfies Content)
   appState.documents = [...appState.documents, doc]
-  return { ...doc, text, chapters }
+  return { ...doc, text, chapters: plainChapters }
 }
 
 export async function deleteDocument(id: string): Promise<void> {
