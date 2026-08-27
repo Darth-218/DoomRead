@@ -339,9 +339,9 @@
     padding: 0.2rem 0.4rem;
     appearance: textfield;
     -moz-appearance: textfield;
-    border: 1px solid var(--border);
+    border: 1px solid var(--fg);
     border-radius: 0.3rem;
-    background: var(--surface);
+    background: var(--bg);
     color: var(--fg);
   }
   .wpm-control input::-webkit-outer-spin-button,

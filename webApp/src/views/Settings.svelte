@@ -14,14 +14,6 @@
     { id: 'dyslexic', label: 'Dyslexia' },
     { id: 'custom', label: 'Custom' },
   ] as const
-
-  const presets = [
-    { id: 'default', label: 'Default' },
-    { id: 'monospace', label: 'Monospace' },
-    { id: 'dyslexia', label: 'Dyslexia' },
-    { id: 'focus-bold', label: 'Focus Bold' },
-    { id: 'orp-reticle', label: 'ORP Reticle' },
-  ] as const
 </script>
 
 <div class="settings">
@@ -56,17 +48,6 @@
         oninput={(e) => settingsStore.setCustomFont(e.currentTarget.value)}
       />
     {/if}
-  </section>
-
-  <section>
-    <h3>Theme presets</h3>
-    <div class="choices">
-      {#each presets as p}
-        <button
-          class:active={settingsStore.preset === p.id}
-          onclick={() => settingsStore.applyPreset(p.id)}>{p.label}</button>
-      {/each}
-    </div>
   </section>
 
   <section>
@@ -195,9 +176,9 @@
     width: 100%;
     font: inherit;
     padding: 0.4rem 0.6rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--fg);
     border-radius: 0.4rem;
-    background: var(--surface);
+    background: var(--bg);
     color: var(--fg);
   }
   .colors {

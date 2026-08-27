@@ -84,9 +84,9 @@
     font-size: 0.9rem;
     width: 4.5rem;
     padding: 0.1rem 0.3rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--fg);
     border-radius: 0.3rem;
-    background: var(--surface);
+    background: var(--bg);
     color: var(--fg);
   }
 </style>

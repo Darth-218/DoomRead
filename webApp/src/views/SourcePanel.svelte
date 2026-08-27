@@ -374,8 +374,9 @@
     color: var(--fg);
     min-width: 7rem;
     text-align: center;
-    border: 1px solid var(--border);
+    border: 1px solid var(--fg);
     border-radius: 0.3rem;
+    background: var(--bg);
     padding: 0.15rem 0.4rem;
   }
   .wordcount {
