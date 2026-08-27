@@ -252,7 +252,6 @@
   {:else}
     word {idx + 1} of {steps.length}
   {/if}
-  {' · '}{running ? 'reading' : 'paused'}
 </p>
 <p class="meta">space: tap to step · hold to read · release to pause · ←/→ step · click word to play/pause</p>
 
