@@ -211,6 +211,7 @@
 
 <style>
   .pager {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -244,8 +245,9 @@
     min-width: 0;
   }
   .source {
-    flex: 1 1 auto;
+    flex: 1 1 0;
     min-width: 0;
+    min-height: 0;
     max-height: 80vh;
     overflow: auto;
     padding: 1.5rem 1.75rem;
