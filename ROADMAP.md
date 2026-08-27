@@ -63,13 +63,15 @@ The single source of truth for all reading logic, compiled to JVM (Android) and 
 > **Built before Android** (decided during implementation) — the Web app is therefore the reference platform for MVP features; Android (Phase 2) will mirror it.
 
 | Item | Req | Status |
-|---|---|---|
-| Svelte + TypeScript + Vite app shell (Reader + Library/Stats/Settings views) | §10 | Done |
+| --- | --- | --- |
+| Svelte + TypeScript + Vite app shell (Reader + Library/ChapterList/Stats/Settings views) | §10 | Done |
 | Consume the KMP core via its Kotlin/JS output (generated `core.mjs`, copied into the web app) | §10 | Done |
-| Speed Read + Immersive modes, same core pacing | FR-1, FR-2 | Todo |
-| Import: paste, file (PDF via pdf.js, EPUB via epub.js) | FR-3.1, FR-3.3, §10 | Todo |
-| IndexedDB storage + backup export/import; periodic export reminder | FR-7, FR-7.4 | Todo |
-| Same themes/typography controls/focus mode as Android | FR-4, FR-5 | Todo |
+| Speed Read (RSVP) + source panel (scroll/paginated, click-to-edit PDF pages, lazy windowing for EPUB/txt), shared position, core pacing | FR-1, FR-2, FR-3.5 | Partial |
+| Import: paste, file (PDF via pdf.js, EPUB via epub.js); chapter data retained | FR-3.1, FR-3.3, §10 | Done |
+| IndexedDB storage + per-doc progress/position persistence | FR-7 | Partial |
+| Typography & theme controls (light/dark + monospace; presets, font family/size, spacing, sepia); Focus Mode | FR-4, FR-5 | Partial |
+| Stats dashboard; backup export/import + periodic export reminder | FR-6.2, FR-7.1, FR-7.2, FR-7.4 | Todo |
+| Chapter navigation UI; sentence-level rewind; explicit mode toggle (RSVP/Immersive) | FR-1.4, FR-2.3, FR-3.5 | Todo |
 | Static hosting (GitHub Pages or self-host) | OQ-9 | Todo |
 
 **Exit criteria:** all MVP features (P0 + P1) work in the browser, driven by the shared core.
