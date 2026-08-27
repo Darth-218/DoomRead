@@ -124,11 +124,23 @@ export async function extractEpub(file: File): Promise<ImportResult> {
   // resolved `loaded.navigation` promise and never touch `book.navigation`
   // directly. Guard everything so a missing/absent TOC just yields fallback
   // titles rather than throwing.
+  // Normalize an href to a comparable key: strip any fragment, decode, and
+  // keep only the basename. EPUB nav and spine hrefs frequently disagree on
+  // path prefixes/encoding, so matching on the basename is far more robust.
+  const normHref = (h: string): string => {
+    try {
+      return decodeURIComponent(h).split('#')[0].split('/').pop()?.toLowerCase() ?? ''
+    } catch {
+      return h.split('#')[0].split('/').pop()?.toLowerCase() ?? ''
+    }
+  }
+
   const tocByHref = new Map<string, string>()
   const walk = (items: any[]) => {
     for (const it of items) {
-      const base = (it.href || '').split('#')[0]
-      if (base && !tocByHref.has(base)) tocByHref.set(base, it.label)
+      const base = normHref(it.href || '')
+      const label = (it.label ?? '').trim()
+      if (base && label && !tocByHref.has(base)) tocByHref.set(base, label)
       if (it.subitems) walk(it.subitems)
     }
   }
@@ -149,11 +161,22 @@ export async function extractEpub(file: File): Promise<ImportResult> {
     const sections = (spine?.spineItems ?? []) as any[]
     for (const section of sections) {
       if (!section.href || section.linear === false || section.linear === 'no') continue
-      const doc = await section.load(book.load.bind(book))
+      // Fetch the section content via book.load (routes through the archive)
+      // and parse it ourselves. Passing the section's Url object to a request
+      // breaks archived books, so we use the string href explicitly.
+      let doc: any
+      try {
+        const loaded = await book.load(section.href)
+        doc =
+          typeof loaded === 'string'
+            ? new DOMParser().parseFromString(loaded, 'application/xhtml+xml')
+            : loaded
+      } catch {
+        continue
+      }
       const t = (doc?.body?.textContent ?? '').trim()
-      section.unload()
       if (!t) continue
-      const base = section.href.split('#')[0]
+      const base = normHref(section.href)
       const title = tocByHref.get(base) ?? `Chapter ${chapters.length + 1}`
       if (text) text += '\n\n'
       const offset = text.length
@@ -161,8 +184,10 @@ export async function extractEpub(file: File): Promise<ImportResult> {
       chapters.push({ title, offset })
     }
   } catch {
-    // Spine unavailable — fall back to whatever text we managed to extract.
+    // Spine unavailable — fall back to whatever text we extracted.
   }
+
+  if (!text.trim()) throw new Error('EPUB contained no extractable text')
   return { text, chapters }
 }
 
