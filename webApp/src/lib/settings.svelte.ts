@@ -39,6 +39,7 @@ const DEFAULTS = {
   readerEffect: 'none' as ReaderEffect,
   bgColor: '',
   fgColor: '',
+  defaultDocId: '',
 }
 
 let displayMode = $state<DisplayMode>(DEFAULTS.displayMode)
@@ -50,6 +51,7 @@ let preset = $state<Preset>(DEFAULTS.preset)
 let readerEffect = $state<ReaderEffect>(DEFAULTS.readerEffect)
 let bgColor = $state<string>(DEFAULTS.bgColor)
 let fgColor = $state<string>(DEFAULTS.fgColor)
+let defaultDocId = $state<string>(DEFAULTS.defaultDocId)
 
 function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n))
@@ -75,10 +77,10 @@ function apply() {
 
 function persist() {
   if (typeof localStorage === 'undefined') return
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({ displayMode, fontFamily, customFont, fontSize, lineSpacing, preset, readerEffect, bgColor, fgColor }),
-  )
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ displayMode, fontFamily, customFont, fontSize, lineSpacing, preset, readerEffect, bgColor, fgColor, defaultDocId }),
+    )
 }
 
 export const settingsStore = {
@@ -108,6 +110,9 @@ export const settingsStore = {
   },
   get fgColor() {
     return fgColor
+  },
+  get defaultDocId() {
+    return defaultDocId
   },
   setDisplayMode(m: DisplayMode) {
     displayMode = m
@@ -165,6 +170,14 @@ export const settingsStore = {
     apply()
     persist()
   },
+  setDefaultDoc(id: string) {
+    defaultDocId = id
+    persist()
+  },
+  clearDefaultDoc() {
+    defaultDocId = ''
+    persist()
+  },
   resetAll() {
     displayMode = DEFAULTS.displayMode
     fontFamily = DEFAULTS.fontFamily
@@ -175,6 +188,7 @@ export const settingsStore = {
     readerEffect = DEFAULTS.readerEffect
     bgColor = DEFAULTS.bgColor
     fgColor = DEFAULTS.fgColor
+    defaultDocId = DEFAULTS.defaultDocId
     apply()
     persist()
   },
@@ -209,6 +223,7 @@ export const settingsStore = {
             readerEffect = p.readerEffect
           if (typeof p.bgColor === 'string') bgColor = p.bgColor
           if (typeof p.fgColor === 'string') fgColor = p.fgColor
+          if (typeof p.defaultDocId === 'string') defaultDocId = p.defaultDocId
         } catch {
           /* ignore corrupt storage */
         }

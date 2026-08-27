@@ -4,28 +4,30 @@
   import Library from './views/Library.svelte'
   import Stats from './views/Stats.svelte'
   import Settings from './views/Settings.svelte'
-  import SpaceTest from './views/SpaceTest.svelte'
   import SourcePanel from './views/SourcePanel.svelte'
   import { getActiveDoc, init, openDocument, appState } from './lib/stores.svelte'
   import { settingsStore } from './lib/settings.svelte'
 
-  type View = 'reader' | 'library' | 'stats' | 'settings' | 'spacetest'
+  type View = 'reader' | 'library' | 'stats' | 'settings'
 
   const nav: { id: View; label: string }[] = [
     { id: 'reader', label: 'Reader' },
     { id: 'library', label: 'Library' },
     { id: 'stats', label: 'Stats' },
     { id: 'settings', label: 'Settings' },
-    { id: 'spacetest', label: 'SpaceTest' },
   ]
 
   let view: View = $state('reader')
 
   const activeDoc = $derived(getActiveDoc())
 
-  onMount(() => {
+  onMount(async () => {
     settingsStore.init()
-    void init()
+    await init()
+    const def = settingsStore.defaultDocId
+    if (def && appState.documents.some((d) => d.id === def) && appState.activeDocumentId !== def) {
+      await openDocument(def)
+    }
   })
 
   function openFromLibrary(id: string) {
@@ -82,8 +84,6 @@
     <Library documents={appState.documents} onOpen={openFromLibrary} />
   {:else if view === 'stats'}
     <Stats />
-  {:else if view === 'spacetest'}
-    <SpaceTest />
   {:else}
     <Settings />
   {/if}
