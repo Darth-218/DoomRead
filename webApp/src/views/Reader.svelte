@@ -224,6 +224,11 @@
 
 <button type="button" class="word" aria-label="Play or pause" onclick={toggle}>{word}</button>
 <div class="controls">
+  <button
+    class="playpause"
+    aria-label={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
+    title={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
+    onclick={toggle}>{running ? '⏸' : finished ? '↻' : '▶'}</button>
   <div class="wpm-row">
     <label for="wpm">WPM {wpm}</label>
     <div class="wpm-control">
@@ -241,11 +246,6 @@
     </div>
     <span class="wpm-ghost" aria-hidden="true">WPM {wpm}</span>
   </div>
-  <button
-    class="playpause"
-    aria-label={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
-    title={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
-    onclick={toggle}>{running ? '⏸' : finished ? '↻' : '▶'}</button>
 </div>
 <p class="meta">
   {#if finished}
@@ -283,7 +283,7 @@
     gap: 0.75rem;
   }
   .wpm-ghost {
-    color: #e0e0e0;
+    color: transparent;
     min-width: 4.5rem;
     text-align: right;
   }
@@ -298,6 +298,10 @@
     padding: 0.2rem 0.4rem;
     appearance: textfield;
     -moz-appearance: textfield;
+    border: 1px solid var(--border);
+    border-radius: 0.3rem;
+    background: var(--surface);
+    color: var(--fg);
   }
   .wpm-control input::-webkit-outer-spin-button,
   .wpm-control input::-webkit-inner-spin-button {
@@ -318,16 +322,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 0.4rem;
-    background: #fff;
+    background: var(--surface);
+    color: var(--fg);
     cursor: pointer;
   }
   .playpause:hover {
-    background: #f0f0f0;
+    background: var(--hover-2);
   }
   .meta {
-    color: #666;
+    color: var(--muted);
     font-size: 0.9rem;
     margin: 0;
   }
