@@ -222,7 +222,8 @@
   })
 </script>
 
-<div class="wpm-row">
+<button type="button" class="word" aria-label="Play or pause" onclick={toggle}>{word}</button>
+<div class="controls">
   <label for="wpm">WPM {wpm}</label>
   <div class="wpm-control">
     <button type="button" aria-label="Decrease speed" onclick={() => setWpm(wpm - 50)}>−50</button>
@@ -237,10 +238,6 @@
     />
     <button type="button" aria-label="Increase speed" onclick={() => setWpm(wpm + 50)}>+50</button>
   </div>
-  <span class="wpm-ghost" aria-hidden="true">WPM {wpm}</span>
-</div>
-<button type="button" class="word" aria-label="Play or pause" onclick={toggle}>{word}</button>
-<div class="controls">
   <button
     class="playpause"
     aria-label={running ? 'Pause' : finished ? 'Re-read' : 'Read'}
@@ -273,19 +270,8 @@
   }
   .controls {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  .wpm-row {
-    display: flex;
     align-items: center;
     gap: 0.75rem;
-  }
-  .wpm-ghost {
-    color: transparent;
-    min-width: 4.5rem;
-    text-align: right;
   }
   .wpm-control {
     display: flex;
