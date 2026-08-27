@@ -149,20 +149,21 @@
       : 0,
   )
 
-  // Word progress ("word X of Y") shown beneath the pager for non-PDF docs.
-  // wordCountUpTo[i] is the number of word nodes among nodes[0..i], so the
-  // current/total counts are O(1) lookups after one O(n) pass per document.
+  // Word progress ("word X of Y") shown beneath the pager. Counted over the
+  // whole document (docNodes) so it's correct for paginated PDFs too; one O(n)
+  // prefix pass per document, O(1) lookups per step.
+  const docNodes = $derived(isPdf ? build(text) : nodes)
   const wordCountUpTo = $derived.by(() => {
     const counts: number[] = []
     let c = 0
-    for (let i = 0; i < nodes.length; i++) {
-      if (nodes[i].type === 'word') c++
+    for (let i = 0; i < docNodes.length; i++) {
+      if (docNodes[i].type === 'word') c++
       counts.push(c)
     }
     return counts
   })
   const totalWords = $derived(wordCountUpTo.length ? wordCountUpTo[wordCountUpTo.length - 1] : 0)
-  const currentWord = $derived(wordCountUpTo[activeIdx] ?? 0)
+  const currentWord = $derived(wordCountUpTo[indexForOffset(docNodes, readerBus.currentOffset)] ?? 0)
 
   let container: HTMLElement | null = $state(null)
 
@@ -328,9 +329,7 @@
       <button type="button" class="phantom" aria-hidden="true" tabindex="-1">→</button>
     {/if}
   </div>
-  {#if !isPdf}
-    <p class="wordcount">word {currentWord} of {totalWords}</p>
-  {/if}
+  <p class="wordcount">word {currentWord} of {totalWords}</p>
 </div>
 
 <style>
@@ -340,7 +339,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    margin-bottom: 0.5rem;
+    margin: 0.5rem 0;
   }
   .pager button {
     border: 1px solid var(--border);
@@ -380,7 +379,7 @@
     padding: 0.15rem 0.4rem;
   }
   .wordcount {
-    margin: 0.75rem 0 0;
+    margin: 0;
     font-size: 0.9rem;
     color: var(--muted);
     text-align: center;
