@@ -224,19 +224,22 @@
 
 <button type="button" class="word" aria-label="Play or pause" onclick={toggle}>{word}</button>
 <div class="controls">
-  <label for="wpm">WPM {wpm}</label>
-  <div class="wpm-control">
-    <button type="button" aria-label="Decrease speed" onclick={() => setWpm(wpm - 50)}>−50</button>
-    <input
-      id="wpm"
-      type="number"
-      min="100"
-      max="1000"
-      step="50"
-      value={wpm}
-      oninput={(e) => setWpm(+(e.currentTarget.value))}
-    />
-    <button type="button" aria-label="Increase speed" onclick={() => setWpm(wpm + 50)}>+50</button>
+  <div class="wpm-row">
+    <label for="wpm">WPM {wpm}</label>
+    <div class="wpm-control">
+      <button type="button" aria-label="Decrease speed" onclick={() => setWpm(wpm - 50)}>−50</button>
+      <input
+        id="wpm"
+        type="number"
+        min="100"
+        max="1000"
+        step="50"
+        value={wpm}
+        oninput={(e) => setWpm(+(e.currentTarget.value))}
+      />
+      <button type="button" aria-label="Increase speed" onclick={() => setWpm(wpm + 50)}>+50</button>
+    </div>
+    <span class="wpm-ghost" aria-hidden="true">WPM {wpm}</span>
   </div>
   <button
     class="playpause"
@@ -251,7 +254,12 @@
     word {idx + 1} of {steps.length}
   {/if}
 </p>
-<p class="meta">space: tap to step · hold to read · release to pause · ←/→ step · click word to play/pause</p>
+<p class="meta">
+  <button class="help" type="button" aria-label="Reading controls help">
+    ?
+    <span class="tooltip">space: tap to step · hold to read · release to pause · ←/→ step · click word to play/pause</span>
+  </button>
+</p>
 
 <style>
   .word {
@@ -270,8 +278,19 @@
   }
   .controls {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .wpm-row {
+    display: flex;
     align-items: center;
     gap: 0.75rem;
+  }
+  .wpm-ghost {
+    color: transparent;
+    min-width: 4.5rem;
+    text-align: right;
   }
   .wpm-control {
     display: flex;
@@ -321,5 +340,49 @@
     color: var(--muted);
     font-size: 0.9rem;
     margin: 0;
+  }
+  .help {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    padding: 0;
+    appearance: none;
+    font: inherit;
+    font-size: 0.9rem;
+    line-height: 1;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--fg);
+    cursor: help;
+  }
+  .tooltip {
+    position: absolute;
+    bottom: 150%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 22rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 0.4rem;
+    background: var(--nav-active-bg);
+    color: var(--nav-active-fg);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    text-align: center;
+    white-space: normal;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.12s ease;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .help:hover .tooltip,
+  .help:focus .tooltip {
+    opacity: 1;
+    visibility: visible;
   }
 </style>
