@@ -228,6 +228,7 @@
   .source {
     flex: 1 1 auto;
     min-width: 0;
+    max-height: 80vh;
     overflow: auto;
     padding: 1.25rem 1.5rem;
     border: 1px solid #ddd;
