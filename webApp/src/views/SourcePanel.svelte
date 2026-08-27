@@ -251,13 +251,15 @@
     max-height: 80vh;
     overflow: auto;
     padding: 1.5rem 1.75rem;
-    border: 1px solid #ddd;
-    border-radius: 0.5rem;
     line-height: 1.9;
     font-size: 1.05rem;
     white-space: pre-wrap;
     word-break: break-word;
     user-select: none;
+    scrollbar-width: none;
+  }
+  .source::-webkit-scrollbar {
+    display: none;
   }
   .text {
     white-space: pre-wrap;
