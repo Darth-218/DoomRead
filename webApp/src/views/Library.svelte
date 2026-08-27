@@ -282,6 +282,7 @@
     border: 1px solid var(--border);
     border-radius: 0.5rem;
     cursor: pointer;
+    user-select: none;
   }
   ul.grid li {
     position: relative;
